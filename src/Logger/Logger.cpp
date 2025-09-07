@@ -3,6 +3,7 @@
 #include <iostream>
 #include <iomanip>
 #include <chrono>
+#include <windows.h>
 
 std::vector<LogEntry> Logger::messages;
 
@@ -43,4 +44,15 @@ void Logger::Err(const std::string& message) {
     messages.push_back({ LogType::LOG_INFO, message });
     std::cout << "\x1B[91m" << logEntry.message << "\033[0m" << '\n';
 
+}
+
+void Logger::EnableANSIColors() {
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hOut == INVALID_HANDLE_VALUE) return;
+
+    DWORD dwMode = 0;
+    if (!GetConsoleMode(hOut, &dwMode)) return;
+
+    dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    SetConsoleMode(hOut, dwMode);
 }

@@ -2,12 +2,16 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 set(PROJECT_NAME PikumaGameEngineLion)
 project(${PROJECT_NAME})
 add_compile_options(/utf-8)
-###dadasdasdasd
+##
 add_executable(${PROJECT_NAME} src/Main.cpp
         src/Logger/Logger.h
         src/Game/Game.h
         src/Game/Game.cpp
-        src/Logger/Logger.cpp)
+        src/Logger/Logger.cpp
+        src/Systems/MovementSystem.h
+        src/ECS/ECS.cpp
+        src/ECS/ECS.h
+        src/Components/TransformComponent.h)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/SDL2/include)
