@@ -33,7 +33,71 @@ class Component: public IComponent {
         return nextId++;
     }
 };
-class Registry{};
+
+///////////////
+///Pool
+//////////////
+
+class IPool {
+public:
+    virtual ~IPool() = default;
+};
+template <typename T>
+class Pool: public IPool {
+private:
+    std::vector<T> data;
+public:
+    Pool(int size = 100) {
+        data.resize(size);
+    }
+    ~Pool() override = default;
+
+    bool isEmpty() const {
+        return data.empty();
+    }
+
+    int GetSize() const {
+        return data.size();
+    }
+
+    void Resize(int n) {
+        data.resize(n);
+    }
+
+    void Clear() {
+        data.clear();
+    }
+
+    void Add(T object) {
+        data.push_back(object);
+    }
+
+    void Set(int index, T object) {
+        data[index] = object;
+    }
+
+    T& Get(int index) const {
+        // why here static cast? later try to remove
+        return static_cast<T&> (data[index]);
+    }
+    T& operator[](int index) const {
+        return data[index];
+    }
+};
+
+
+////////////////
+////Registry
+////////////////
+class Registry {
+private:
+    int numEntities = 0;
+    // Vector of component pools
+    // each pool contains all the data for a certain component
+    // Vector idx = component type id
+    // Pool index = entity id
+    std::vector<IPool*> componentPools;
+};
 
 
 

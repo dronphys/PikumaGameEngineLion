@@ -16,7 +16,7 @@ void System::AddEntityToSystem(Entity entity) {
     entities.push_back(entity);
 }
 
-void System::RemoveEntityFromSystem(Entity entity) {
+void System::RemoveEntityFromSystem(const Entity entity) {
     entities.erase(
         std::remove(entities.begin(), entities.end(), entity), entities.end());
 }
