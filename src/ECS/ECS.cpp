@@ -4,6 +4,9 @@
 
 #include "ECS.h"
 #include <algorithm>
+
+int IComponent::nextId = 0; // definng static variable in IComponent class
+
 int Entity::GetId() const {
     return id;
 }
@@ -33,25 +36,6 @@ const Signature & System::GetComponentSignature() const {
     return componentSignature;
 }
 
-Entity Registry::CreateEntity() {
-    int entityID;
-    entityID = numEntities++;
-    Entity entity(entityID);
-    entitiesToBeAdded.insert(entity);
-
-
-    Logger::Log("Entity created with id = " + std::to_string( entityID));
-    return entity;
-}
-
-void Registry::Update() {
-    // TODO: add the entities to be created
-    // TODO: Remove entities that are to be killed
-}
-
-void Registry::AddEntityToSystem(Entity entity) {
-
-}
 
 
 

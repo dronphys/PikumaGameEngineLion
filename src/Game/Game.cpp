@@ -2,8 +2,13 @@
 #include <iostream>
 #include "../Logger/Logger.h"
 #include "../ECS/ECS.h"
+#include "spdlog/common.h"
+#include <memory>
+
+
 Game::Game() {
 	isRunning = false;
+	registry = std::make_unique<Registry>();
 	Logger::Log("Game constructor called!");
 }
 
@@ -17,8 +22,6 @@ void Game::Initialize() {
 		std::cerr<< "Error initializing SDL." << std::endl;
 		return;
 	}
-
-
 
 	SDL_Rect displayBounds;
 	if (SDL_GetDisplayBounds(0, &displayBounds) != 0) {
@@ -58,15 +61,28 @@ void Game::Initialize() {
 }
 
 
-glm::vec2 playerPosition;
-glm::vec2 playerVelocity;
+
 
 void Game::Setup() {
-	playerPosition.x = 10.0;
-	playerPosition.y = 20.0;
+	// create entity
+	Entity tank = registry->CreateEntity();
+	// add components
+	tank.AddComponent<TransformComponent>(
+		 glm::vec2(10.0,30.0)
+		,glm::vec2(0.0, 1.0)
+		,0.0
+		);
 
-	playerVelocity.x = 30.0;
-	playerVelocity.y = 0.0;
+	tank.AddComponent<RigidBodyComponent>(glm::vec2(5.0,0.0));
+
+	Entity player = registry->CreateEntity();
+	player.AddComponent<TransformComponent>(
+		 glm::vec2(10.0,30.0)
+		,glm::vec2(0.0, 1.0)
+		,0.0
+		);
+	player.AddComponent<RigidBodyComponent>(glm::vec2(5.0,0.0));
+	player.RemoveComponent<TransformComponent>();
 }
 
 void Game::Run() {
@@ -107,8 +123,7 @@ void Game::Update() {
 
 	// store current frame time;
 	millisecsPreviousFrame = SDL_GetTicks();
-	playerPosition.x += playerVelocity.x * deltaTime;
-	playerPosition.y += playerVelocity.y * deltaTime;
+
 }
 
 void Game::Render() {
@@ -122,12 +137,7 @@ void Game::Render() {
 	SDL_FreeSurface(surface);
 
 	// destination rectangle to paste the texture.
-	SDL_Rect dstRect = { 
-		static_cast<int>(playerPosition.x), 
-		static_cast<int>(playerPosition.y), 
-		32, 
-		32 };
-	SDL_RenderCopy(renderer, texture, NULL, &dstRect);
+
 
 	SDL_DestroyTexture(texture);
 

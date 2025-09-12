@@ -1,10 +1,15 @@
 #ifndef GAME_H
 #define GAME_H
+#include <memory>
 #include <SDL.h>
 #include <SDL_image.h>
 #include <string>
 #include <glm/glm.hpp>
-
+#include "../ECS/ECS.h"
+#include "../ECS/Registry.h"
+#include <memory>
+#include "../Components/TransformComponent.h"
+#include "../Components/RigidBodyComponent.h"
 
 #define MY_PROJECT_PATH "E:/dev/PikumaGameEngine/PikumaGameEngine"
 
@@ -19,6 +24,7 @@ private:
 	int millisecsPreviousFrame = 0;
 	SDL_Window* window;
 	SDL_Renderer* renderer;
+	std::unique_ptr<Registry> registry;
 
 public:
 	Game();
