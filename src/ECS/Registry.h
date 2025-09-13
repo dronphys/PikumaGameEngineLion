@@ -120,7 +120,7 @@ template<typename TComponent>
 TComponent& Registry::GetComponent(const Entity entity) const {
     const auto componentId = Component<TComponent>::GetId();
     auto componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentId]);
-    return componentPool->Get(entity);
+    return componentPool->Get(entity.GetId());
     //return componentPools[componentId]->Get(entity.GetId());
 }
 
@@ -143,8 +143,8 @@ bool Registry::HasSystem() const {
 // This function might be wrong
 template<typename TSystem>
 TSystem& Registry::GetSystem() const {
-    // TODO check it later
-    return systems.at(std::type_index(typeid(TSystem)));
+    auto system = systems.find(std::type_index(typeid(TSystem)));
+    return *(std::static_pointer_cast<TSystem>(system->second));
 }
 
 

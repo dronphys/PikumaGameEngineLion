@@ -9,6 +9,6 @@
 struct RigidBodyComponent {
     glm::vec2 velocity;
     RigidBodyComponent(glm::vec2 _velocity = glm::vec2(0.0,0.0))
-    : velocity(_velocity) {}
+    : velocity(_velocity) {};
 };
 #endif //RIGIDBODYCOMPONENT_H

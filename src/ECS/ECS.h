@@ -102,7 +102,7 @@ public:
         data[index] = object;
     }
 
-    T& Get(int index) const {
+    T& Get(int index) {
         // why here static cast? later try to remove
         return static_cast<T&> (data[index]);
     }

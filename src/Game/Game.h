@@ -8,8 +8,7 @@
 #include "../ECS/ECS.h"
 #include "../ECS/Registry.h"
 #include <memory>
-#include "../Components/TransformComponent.h"
-#include "../Components/RigidBodyComponent.h"
+
 
 #define MY_PROJECT_PATH "E:/dev/PikumaGameEngine/PikumaGameEngine"
 

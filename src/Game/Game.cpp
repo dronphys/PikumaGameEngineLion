@@ -4,7 +4,9 @@
 #include "../ECS/ECS.h"
 #include "spdlog/common.h"
 #include <memory>
-
+#include "../Systems/MovementSystem.h"
+#include "../Systems/RenderSystem.h"
+#include "../Components/AllComponents.h"
 
 Game::Game() {
 	isRunning = false;
@@ -64,6 +66,10 @@ void Game::Initialize() {
 
 
 void Game::Setup() {
+	// Add systems to the game
+	registry->AddSystem<MovementSystem>();
+	registry->AddSystem<RenderSystem>();
+
 	// create entity
 	Entity tank = registry->CreateEntity();
 	// add components
@@ -73,16 +79,21 @@ void Game::Setup() {
 		,0.0
 		);
 
-	tank.AddComponent<RigidBodyComponent>(glm::vec2(5.0,0.0));
+	tank.AddComponent<RigidBodyComponent>(glm::vec2(25.0,24.0));
+	tank.AddComponent<SpriteComponent>(30,30);
+
+
 
 	Entity player = registry->CreateEntity();
+	// add components
 	player.AddComponent<TransformComponent>(
-		 glm::vec2(10.0,30.0)
-		,glm::vec2(0.0, 1.0)
+		 glm::vec2(500.0,100.0)
+		,glm::vec2(1.0, 1.0)
 		,0.0
 		);
-	player.AddComponent<RigidBodyComponent>(glm::vec2(5.0,0.0));
-	player.RemoveComponent<TransformComponent>();
+
+	player.AddComponent<RigidBodyComponent>(glm::vec2(-25.0,24.0));
+	player.AddComponent<SpriteComponent>(30,30);
 }
 
 void Game::Run() {
@@ -121,25 +132,19 @@ void Game::Update() {
 	}
 	double deltaTime = (SDL_GetTicks() - millisecsPreviousFrame) / 1000.0f;
 
+	//Ask registry to update a movement system
+	registry->GetSystem<MovementSystem>().Update(deltaTime);
 	// store current frame time;
 	millisecsPreviousFrame = SDL_GetTicks();
 
+	registry->Update();
 }
 
 void Game::Render() {
 	SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
 	SDL_RenderClear(renderer);
 
-	// TODO:: Render all game objects here
-	
-	SDL_Surface* surface = IMG_Load(MY_PROJECT_PATH"/assets/images/tank-tiger-right.png");
-	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-	SDL_FreeSurface(surface);
-
-	// destination rectangle to paste the texture.
-
-
-	SDL_DestroyTexture(texture);
+	registry->GetSystem<RenderSystem>().Update(renderer);
 
 	SDL_RenderPresent(renderer);
 }
