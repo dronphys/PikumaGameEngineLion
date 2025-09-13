@@ -19,7 +19,9 @@ add_executable(${PROJECT_NAME} src/Main.cpp
         src/Components/RigidBodyComponent.h
         src/Components/SpriteComponent.h
         src/Components/AllComponents.h
-        src/Systems/RenderSystem.h)
+        src/Systems/RenderSystem.h
+        src/AssetStore/AssetStore.cpp
+        src/AssetStore/AssetStore.h)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/SDL2/include)

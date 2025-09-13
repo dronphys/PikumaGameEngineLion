@@ -8,7 +8,7 @@
 #include "../ECS/ECS.h"
 #include "../ECS/Registry.h"
 #include <memory>
-
+#include "../AssetStore/AssetStore.h"
 
 #define MY_PROJECT_PATH "E:/dev/PikumaGameEngine/PikumaGameEngine"
 
@@ -24,6 +24,7 @@ private:
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 	std::unique_ptr<Registry> registry;
+	std::unique_ptr<AssetStore> assetStore;
 
 public:
 	Game();
