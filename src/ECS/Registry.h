@@ -73,7 +73,7 @@ void Registry::AddComponent(const Entity entity, TArgs&& ...args) {
     const auto componentId = Component<TComponent>::GetId();
     const auto entityId = entity.GetId();
     if (componentId >= componentPools.size()) {
-        componentPools.resize(componentPools.size() + 1, nullptr);
+        componentPools.resize(componentId + 1, nullptr);
     }
     if (!componentPools[componentId]) {
         std::shared_ptr<Pool<TComponent>> newComponentPool = std::make_shared<Pool<TComponent>>();
