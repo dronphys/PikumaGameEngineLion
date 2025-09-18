@@ -36,6 +36,8 @@ public:
 	void Update();
 	void Render();
 	void Destroy();
+	void LoadLevel(int level);
+	void LoadLevelFromFile(std::string fileName);
 
 	int windowWidth;
 	int windowHeight;

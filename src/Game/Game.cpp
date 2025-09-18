@@ -7,6 +7,8 @@
 #include "../Systems/MovementSystem.h"
 #include "../Systems/RenderSystem.h"
 #include "../Components/AllComponents.h"
+#include <fstream>
+#include <sstream>
 
 Game::Game() {
 	isRunning = false;
@@ -62,42 +64,97 @@ void Game::Initialize() {
 
 	isRunning = true;
 }
+void Game::LoadLevelFromFile(std::string fileName) {
+	// open file
+	std::ifstream file(fileName);
+
+	std::string line;
+	std::vector<std::vector<int>> level;
+	while (std::getline(file, line)) {
+		std::stringstream ss(line);
+		std::string token;
+		std::vector<int> numbers;
+
+		while (std::getline(ss, token, ',')) {
+			int value = std::stoi(token); // convert string -> int
+			numbers.push_back(value);
+		}
+		level.push_back(numbers);
+	}
+	int y_text = 0, x_text = 0;
+	int y_map = 0, x_map = 0;
+	for (auto vec: level) {
+		for (auto el: vec) {
+			y_text = el/10;
+			x_text = el%10;
+
+			std::cout << y_text << ", " << x_text << ": " << el << std::endl;
+			Entity terrain = registry->CreateEntity();
+			terrain.AddComponent<TransformComponent>(
+				glm::vec2(static_cast<double>(x_text), static_cast<double>(y_text)),
+				glm::vec2(static_cast<double>(x_map*32), static_cast<double>(y_map*32)),
+				0.0);
+			terrain.AddComponent<SpriteComponent>(
+				"tilemap",32,32, x_text*32, x_text*32);
+			x_map++;
+		}
+
+		y_map++;
+
+	}
 
 
 
+}
 
-void Game::Setup() {
-	// Add systems to the game
+void Game::LoadLevel(int level) {
 	registry->AddSystem<MovementSystem>();
 	registry->AddSystem<RenderSystem>();
 
 	assetStore->AddTexture(renderer,"tank-image", "../assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer,"truck-image", "../assets/images/truck-ford-right.png");
+	assetStore->AddTexture(renderer, "tilemap", "../assets/tilemaps/jungle.png");
+
+
+	LoadLevelFromFile("../assets/tilemaps/jungle.map");
+
+
+	// TODO
+	// Load  the timemap ./assets/tilemaps/jungle.png
+	// we need to load the file ./assets/tilemaps/jungle.map
+	// use idea of source rectangle.
+	// Consider creating one entity per tile
 
 	// create entity
-	Entity tank = registry->CreateEntity();
-	// add components
-	tank.AddComponent<TransformComponent>(
-		 glm::vec2(10.0,10.0)
-		,glm::vec2(3.0, 3.0)
-		,45.0
-		);
+	// Entity tank = registry->CreateEntity();
+	// // add components
+	// tank.AddComponent<TransformComponent>(
+	// 	 glm::vec2(00.0,00.0)
+	// 	,glm::vec2(3.0, 3.0)
+	// 	,45.0
+	// 	);
+	//
+	// tank.AddComponent<RigidBodyComponent>(glm::vec2(40.0,0.0));
+	// tank.AddComponent<SpriteComponent>("tank-image",32,32);
+	//
+	//
+	// // create entity
+	// Entity truck = registry->CreateEntity();
+	// // add components
+	// truck.AddComponent<TransformComponent>(
+	// 	 glm::vec2(10.0,10.0)
+	// 	,glm::vec2(2.0, 2.0)
+	// 	,90.0
+	// 	);
+	//
+	// truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0,55.0));
+	// truck.AddComponent<SpriteComponent>("truck-image",32,32);
+}
 
-	tank.AddComponent<RigidBodyComponent>(glm::vec2(40.0,0.0));
-	tank.AddComponent<SpriteComponent>("tank-image",32,32);
 
 
-	// create entity
-	Entity truck = registry->CreateEntity();
-	// add components
-	truck.AddComponent<TransformComponent>(
-		 glm::vec2(10.0,10.0)
-		,glm::vec2(2.0, 2.0)
-		,90.0
-		);
-
-	truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0,55.0));
-	truck.AddComponent<SpriteComponent>("truck-image",32,32);
+void Game::Setup() {
+	LoadLevel(1);
 
 }
 
