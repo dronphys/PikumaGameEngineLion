@@ -14,12 +14,8 @@ struct SpriteComponent {
     SDL_Rect srcRect;
     //we need to always have default values
     SpriteComponent(std::string assetId = "", int width = 0, int height = 0, int srcRectX = 0, int srcRectY = 0)
-    : assetId(assetId) ,width(width), height(height) {
-        srcRect = {srcRectX, srcRectY, width, height};
-        std::cout << "************" << std::endl;
-        std::cout << assetId << std::endl;
-        std::cout << srcRectX << " " << srcRectY << std::endl;
-        std::cout << "************" << std::endl;
-    };
+    : assetId(assetId) ,width(width), height(height), srcRect{srcRectX,srcRectY,width,height} {
+
+    }
 };
 #endif //SPRITECOMPONENT_H

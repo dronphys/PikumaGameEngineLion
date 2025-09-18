@@ -99,7 +99,7 @@ public:
     }
 
     void Set(int index, T object) {
-        data[index] = object;
+        data[index] = std::move(object);
     }
 
     T& Get(int index) {

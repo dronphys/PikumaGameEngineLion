@@ -86,8 +86,10 @@ void Registry::AddComponent(const Entity entity, TArgs&& ...args) {
         componentPool->Resize(numEntities);
     }
 
-    TComponent newComponent(std::forward<TArgs>(args)...);
-    componentPool->Set(entityId, newComponent);
+    // TComponent newComponent(std::forward<TArgs>(args)...);
+    // componentPool->Set(entityId, newComponent);
+
+    componentPool->Set(entityId, TComponent(std::forward<TArgs>(args)...));
 
     if (entityId >= entityComponentSignatures.size()) {
         entityComponentSignatures.resize(entityComponentSignatures.size() + 1);

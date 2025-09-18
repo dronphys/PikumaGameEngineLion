@@ -34,8 +34,8 @@ void Game::Initialize() {
 		return;
 	}
 
-	windowWidth = displayBounds.w / 2;
-	windowHeight = displayBounds.h / 2;
+	windowWidth = displayBounds.w ;
+	windowHeight = displayBounds.h ;
 
 	std::cout << windowWidth << std::endl;
 	window = SDL_CreateWindow(
@@ -94,11 +94,10 @@ void Game::LoadLevelFromFile(std::string fileName) {
 				glm::vec2(static_cast<double>(x_map*32), static_cast<double>(y_map*32)),
 				glm::vec2(1.0, 1.0),
 				0.0);
-			terrain.AddComponent<SpriteComponent>(
-				"tilemap",32,32, x_text*32, x_text*32);
+			terrain.AddComponent<SpriteComponent>("tilemap-image",32,32, x_text*32, y_text*32);
 			x_map++;
 		}
-
+		std::cout << std::endl;
 		y_map++;
 		x_map = 0;
 
@@ -109,16 +108,39 @@ void Game::LoadLevelFromFile(std::string fileName) {
 }
 
 void Game::LoadLevel(int level) {
-
+	registry->AddSystem<MovementSystem>();
+	registry->AddSystem<RenderSystem>();
 
 	assetStore->AddTexture(renderer,"tank-image", "../assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer,"truck-image", "../assets/images/truck-ford-right.png");
-	assetStore->AddTexture(renderer, "tilemap", "../assets/tilemaps/jungle.png");
+	assetStore->AddTexture(renderer, "tilemap-image", "../assets/tilemaps/jungle.png");
 
+	int tileSize = 32;
+	double tileScale = 2.0;
+	int mapNumCols = 25;
+	int mapNumRows = 20;
+	std::fstream mapFile;
+	mapFile.open("../assets/tilemaps/jungle.map");
 
-	LoadLevelFromFile("../assets/tilemaps/jungle.map");
-	registry->AddSystem<MovementSystem>();
-	registry->AddSystem<RenderSystem>();
+	for (int y = 0; y < mapNumRows; y++) {
+		for (int x = 0; x < mapNumCols; x++) {
+			char ch;
+			mapFile.get(ch);
+			int srcRectY = std::atoi(&ch) * tileSize;
+			mapFile.get(ch);
+			int srcRectX = std::atoi(&ch) * tileSize;
+			mapFile.ignore();
+
+			Entity tile = registry->CreateEntity();
+			tile.AddComponent<TransformComponent>(
+				glm::vec2(x*tileScale*tileSize, y*tileScale*tileSize),
+				glm::vec2(tileScale, tileScale),
+				0.0);
+			tile.AddComponent<SpriteComponent>("tilemap-image",tileSize, tileSize, srcRectX, srcRectY);
+		}
+	}
+	mapFile.close();
+
 
 	// TODO
 	// Load  the timemap ./assets/tilemaps/jungle.png
@@ -127,6 +149,8 @@ void Game::LoadLevel(int level) {
 	// Consider creating one entity per tile
 
 	// create entity
+
+
 	Entity tank = registry->CreateEntity();
 	// add components
 	tank.AddComponent<TransformComponent>(
@@ -136,8 +160,6 @@ void Game::LoadLevel(int level) {
 		);
 	tank.AddComponent<SpriteComponent>("tank-image",32,32);
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(-40.0,5.0));
-
-
 
 
 }
