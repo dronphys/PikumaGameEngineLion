@@ -64,72 +64,39 @@ void Game::Initialize() {
 
 	isRunning = true;
 }
-void Game::LoadLevelFromFile(std::string fileName) {
+void Game::LoadLevelFromFile(const std::string& fileName) {
 	// open file
-	std::ifstream file(fileName);
+	int textureColNumbers = 10;
+	int tileSize = 32;
+	double tileScale = 2.0;
+	int mapNumCols = 0;
+	int mapNumRows = 0;
 
+	std::ifstream file(fileName);
 	std::string line;
-	std::vector<std::vector<int>> level;
+	std::vector<std::vector<int>> levelMap;
+
 	while (std::getline(file, line)) {
 		std::stringstream ss(line);
 		std::string token;
-		std::vector<int> numbers;
+		std::vector<int> raw;
 
 		while (std::getline(ss, token, ',')) {
 			int value = std::stoi(token); // convert string -> int
-			numbers.push_back(value);
+			raw.push_back(value);
 		}
-		level.push_back(numbers);
+		levelMap.push_back(raw);
 	}
-	int y_text = 0, x_text = 0;
-	int y_map = 0, x_map = 0;
-	for (auto vec: level) {
-		for (auto el: vec) {
-			y_text = el/10;
-			x_text = el%10;
-
-			std::cout << y_text << ", " << x_text << ": " << el << std::endl;
-			Entity terrain = registry->CreateEntity();
-			terrain.AddComponent<TransformComponent>(
-				glm::vec2(static_cast<double>(x_map*32), static_cast<double>(y_map*32)),
-				glm::vec2(1.0, 1.0),
-				0.0);
-			terrain.AddComponent<SpriteComponent>("tilemap-image",32,32, x_text*32, y_text*32);
-			x_map++;
-		}
-		std::cout << std::endl;
-		y_map++;
-		x_map = 0;
-
-	}
+	mapNumCols = levelMap[0].size();
+	mapNumRows = levelMap.size();
 
 
-
-}
-
-void Game::LoadLevel(int level) {
-	registry->AddSystem<MovementSystem>();
-	registry->AddSystem<RenderSystem>();
-
-	assetStore->AddTexture(renderer,"tank-image", "../assets/images/tank-panther-right.png");
-	assetStore->AddTexture(renderer,"truck-image", "../assets/images/truck-ford-right.png");
-	assetStore->AddTexture(renderer, "tilemap-image", "../assets/tilemaps/jungle.png");
-
-	int tileSize = 32;
-	double tileScale = 2.0;
-	int mapNumCols = 25;
-	int mapNumRows = 20;
-	std::fstream mapFile;
-	mapFile.open("../assets/tilemaps/jungle.map");
-
-	for (int y = 0; y < mapNumRows; y++) {
-		for (int x = 0; x < mapNumCols; x++) {
-			char ch;
-			mapFile.get(ch);
-			int srcRectY = std::atoi(&ch) * tileSize;
-			mapFile.get(ch);
-			int srcRectX = std::atoi(&ch) * tileSize;
-			mapFile.ignore();
+	// creating entities
+	for (auto y = 0; y < mapNumRows; y++) {
+		for (auto x = 0; x < mapNumCols; x++) {
+			// TODO change this later. Only walid for texture with 10 cols.
+			int srcRectY = (levelMap[y][x] / textureColNumbers) * tileSize;
+			int srcRectX = (levelMap[y][x] % textureColNumbers) * tileSize;
 
 			Entity tile = registry->CreateEntity();
 			tile.AddComponent<TransformComponent>(
@@ -139,17 +106,19 @@ void Game::LoadLevel(int level) {
 			tile.AddComponent<SpriteComponent>("tilemap-image",tileSize, tileSize, srcRectX, srcRectY);
 		}
 	}
-	mapFile.close();
 
+}
 
-	// TODO
-	// Load  the timemap ./assets/tilemaps/jungle.png
-	// we need to load the file ./assets/tilemaps/jungle.map
-	// use idea of source rectangle.
-	// Consider creating one entity per tile
+void Game::LoadLevel(int level) {
 
-	// create entity
+	registry->AddSystem<MovementSystem>();
+	registry->AddSystem<RenderSystem>();
 
+	assetStore->AddTexture(renderer,"tank-image", "../assets/images/tank-panther-right.png");
+	assetStore->AddTexture(renderer,"truck-image", "../assets/images/truck-ford-right.png");
+	assetStore->AddTexture(renderer, "tilemap-image", "../assets/tilemaps/jungle.png");
+
+	LoadLevelFromFile("../assets/tilemaps/jungle.map");
 
 	Entity tank = registry->CreateEntity();
 	// add components
@@ -160,8 +129,6 @@ void Game::LoadLevel(int level) {
 		);
 	tank.AddComponent<SpriteComponent>("tank-image",32,32);
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(-40.0,5.0));
-
-
 }
 
 
