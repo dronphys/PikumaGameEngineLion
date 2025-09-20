@@ -11,10 +11,22 @@ struct SpriteComponent {
     std::string assetId;
     int width;
     int height;
+    // defines the order in which entities are drawn in the screen
+    int zIndex;
     SDL_Rect srcRect;
     //we need to always have default values
-    SpriteComponent(std::string assetId = "", int width = 0, int height = 0, int srcRectX = 0, int srcRectY = 0)
-    : assetId(assetId) ,width(width), height(height), srcRect{srcRectX,srcRectY,width,height} {
+    SpriteComponent(
+        std::string assetId = "",
+        int width = 0,
+        int height = 0,
+        int zIndex = 0,
+        int srcRectX = 0,
+        int srcRectY = 0)
+    : assetId(assetId),
+    width(width),
+    height(height),
+    zIndex(zIndex),
+    srcRect{srcRectX,srcRectY,width,height} {
 
     }
 };

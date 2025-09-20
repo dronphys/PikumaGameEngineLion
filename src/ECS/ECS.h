@@ -114,14 +114,14 @@ public:
 
 // system processes entities that contain a specific signature
 class System {
-private:
+protected:
     Signature componentSignature;
     std::vector<Entity> entities;
 public:
     System() = default;
-    ~System() = default;
+    virtual ~System() = default;
 
-    void AddEntityToSystem(Entity entity);
+    virtual void AddEntityToSystem(Entity entity);
     void RemoveEntityFromSystem(Entity entity);
     std::vector<Entity> GetSystemEntities() const;
     const Signature& GetComponentSignature() const;

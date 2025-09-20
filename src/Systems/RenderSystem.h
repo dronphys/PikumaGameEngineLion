@@ -8,14 +8,24 @@
 #include "../Components/AllComponents.h"
 #include "SDL.h"
 #include "../AssetStore/AssetStore.h"
-
+#include <algorithm>
 class RenderSystem: public System {
 public:
     RenderSystem() {
         RequireComponent<TransformComponent>();
         RequireComponent<SpriteComponent>();
     }
+    void AddEntityToSystem(Entity entity) override {
+        entities.push_back(entity);
+        std::sort(entities.begin(), entities.end(), [](Entity a, Entity b) {
+            return a.GetComponent<SpriteComponent>().zIndex < b.GetComponent<SpriteComponent>().zIndex;
+        });
+    }
     void Update(SDL_Renderer* renderer, std::unique_ptr<AssetStore>& assetStore) {
+
+        // TODO sort all entities by z index
+
+
         for (auto entity: GetSystemEntities()) {
             const auto& transform = entity.GetComponent<TransformComponent>();
             const auto& sprite = entity.GetComponent<SpriteComponent>();
