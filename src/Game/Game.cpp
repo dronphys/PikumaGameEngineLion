@@ -6,6 +6,7 @@
 #include <memory>
 #include "../Systems/MovementSystem.h"
 #include "../Systems/RenderSystem.h"
+#include "../Systems/AnimationSystem.h"
 #include "../Components/AllComponents.h"
 #include <fstream>
 #include <sstream>
@@ -113,11 +114,13 @@ void Game::LoadLevel(int level) {
 
 	registry->AddSystem<MovementSystem>();
 	registry->AddSystem<RenderSystem>();
+	registry->AddSystem<AnimationSystem>();
 
 	assetStore->AddTexture(renderer,"tank-image", "../assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer,"truck-image", "../assets/images/truck-ford-right.png");
 	assetStore->AddTexture(renderer, "tilemap-image", "../assets/tilemaps/jungle.png");
-
+	assetStore->AddTexture(renderer,"chopper-image", "../assets/images/chopper.png");
+	assetStore->AddTexture(renderer,"radar-image", "../assets/images/radar.png");
 	LoadLevelFromFile("../assets/tilemaps/jungle.map");
 
 	Entity tank = registry->CreateEntity();
@@ -125,8 +128,7 @@ void Game::LoadLevel(int level) {
 	tank.AddComponent<TransformComponent>(
 		 glm::vec2(300.0,00.0)
 		,glm::vec2(3.0, 3.0)
-		,0.0
-		);
+		,0.0);
 	tank.AddComponent<SpriteComponent>("tank-image",32,32,2);
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(40.0,0.0));
 
@@ -135,10 +137,29 @@ void Game::LoadLevel(int level) {
 	truck.AddComponent<TransformComponent>(
 		 glm::vec2(500.0,00.0)
 		,glm::vec2(3.0, 3.0)
-		,0.0
-		);
+		,0.0);
 	truck.AddComponent<SpriteComponent>("truck-image",32,32,1);
 	truck.AddComponent<RigidBodyComponent>(glm::vec2(-40.0,0.0));
+
+	Entity chopper = registry->CreateEntity();
+	// add components
+	chopper.AddComponent<TransformComponent>(
+		 glm::vec2(600.0,00.0)
+		,glm::vec2(3.0, 3.0)
+		,0.0);
+	chopper.AddComponent<SpriteComponent>("chopper-image",32,32,1);
+	chopper.AddComponent<RigidBodyComponent>(glm::vec2(100.0,0.0));
+	chopper.AddComponent<AnimationComponent>(2,10);
+
+	Entity radar = registry->CreateEntity();
+	// add components
+	radar.AddComponent<TransformComponent>(
+		 glm::vec2(1400.0,0.0)
+		,glm::vec2(1.0, 1.0)
+		,0.0);
+	radar.AddComponent<SpriteComponent>("radar-image",64,64,1);
+	radar.AddComponent<AnimationComponent>(8,5);
+
 }
 
 
@@ -186,6 +207,7 @@ void Game::Update() {
 
 	//Ask registry to update a movement system
 	registry->GetSystem<MovementSystem>().Update(deltaTime);
+	registry->GetSystem<AnimationSystem>().Update();
 	// store current frame time;
 	millisecsPreviousFrame = SDL_GetTicks();
 

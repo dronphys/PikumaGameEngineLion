@@ -7,5 +7,5 @@
 #include "SpriteComponent.h"
 #include "RigidBodyComponent.h"
 #include "TransformComponent.h"
-
+#include "AnimationComponent.h"
 #endif //ALLCOMPONENTS_H
