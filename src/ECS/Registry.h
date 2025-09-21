@@ -4,9 +4,11 @@
 
 #ifndef REGISTRY_H
 #define REGISTRY_H
+#include <deque>
 #include <memory>
 #include "ECS.h"
-
+#include <iostream>
+#include <utility>
 
 ////////////////
 ////Registry
@@ -32,9 +34,14 @@ private:
     std::set<Entity> entitiesToBeAdded;
     std::set<Entity> entitiesToBeKilled;
 
+    std::vector<std::pair<Entity,std::shared_ptr<System>>> entitiesToBeRemovedFromSystems;
+
+    std::deque<int> freeIds;
+
 public:
     Registry() = default;
     Entity CreateEntity();
+    void KillEntity(Entity entity);
     void Update();
 
     template <typename T, typename... TArgs>
@@ -65,7 +72,9 @@ public:
     //Checks the component signature of an entity and add the entity to the systems
     // that are interested in it
     void AddEntityToSystems(Entity entity);
+    void RemoveEntityFromSystems(Entity entity);
 };
+
 
 
 template<typename TComponent, typename ... TArgs>
@@ -101,9 +110,26 @@ void Registry::AddComponent(const Entity entity, TArgs&& ...args) {
 
 template<typename TComponent>
 void Registry::RemoveComponent(const Entity entity) {
+    if (!HasComponent<TComponent>(entity)) {return;} // do nothing if there is no such component
+
     const auto componentId = Component<TComponent>::GetId();
     const auto entityId = entity.GetId();
     entityComponentSignatures[entityId].set(componentId, false);
+
+    // We have to remove entity from Systems if the components no longer satisfy this system
+    const auto& entityComponentSignature = entityComponentSignatures[entityId];
+    for (auto& [id,system]: systems) {
+        const auto& systemComponentSignature = system->GetComponentSignature();
+
+        // we check if entity is not in the system we remove this system
+        // if entity wasn't in the system, nothing bad will happen.
+        const bool notInSystem = (entityComponentSignature & systemComponentSignature) != systemComponentSignature;
+        if (notInSystem) {
+
+            entitiesToBeRemovedFromSystems.push_back(std::make_pair(entity, system));
+        }
+    }
+
     Logger::Log("Component id = " + std::to_string(componentId) + " has been removed from entity id: " + std::to_string(entityId));
 }
 
@@ -111,7 +137,7 @@ template<typename TComponent>
 bool Registry::HasComponent(const Entity entity) const {
     const auto componentId = Component<TComponent>::GetId();
     const auto entityId = entity.GetId();
-    return entityComponentSignatures[componentId].test(entityId);
+    return entityComponentSignatures[entityId].test(componentId);
 
 }
 //TODO check if I can remove static_pointer_cast

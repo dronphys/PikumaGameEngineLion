@@ -1,0 +1,20 @@
+//
+// Created by kuyba on 9/21/2025.
+//
+
+#ifndef BOXCOLLIDERCOMPONENT_H
+#define BOXCOLLIDERCOMPONENT_H
+#include <glm/glm.hpp>
+
+
+struct BoxColliderComponent {
+    int width;
+    int height;
+    glm::vec2 offset;
+    bool isColliding;
+    BoxColliderComponent(int width = 0, int height = 0, glm::vec2 offset = glm::vec2(0.0))
+    :width(width), height(height), offset(offset), isColliding(false) {}
+};
+
+
+#endif //BOXCOLLIDERCOMPONENT_H

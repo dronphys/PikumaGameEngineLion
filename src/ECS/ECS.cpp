@@ -5,7 +5,13 @@
 #include "ECS.h"
 #include <algorithm>
 
+#include "Registry.h"
+
 int IComponent::nextId = 0; // definng static variable in IComponent class
+
+void Entity::Kill() {
+    registry->KillEntity(*this);
+}
 
 int Entity::GetId() const {
     return id;

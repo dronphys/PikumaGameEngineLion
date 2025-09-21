@@ -8,4 +8,5 @@
 #include "RigidBodyComponent.h"
 #include "TransformComponent.h"
 #include "AnimationComponent.h"
+#include "BoxColliderComponent.h"
 #endif //ALLCOMPONENTS_H
