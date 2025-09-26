@@ -11,8 +11,12 @@
 #include "../Systems/DamageSystem.h"
 #include "../Systems/RenderCollisionSystem.h"
 #include "../Components/AllComponents.h"
+#include "../Events/KeyPressedEvent.h"
 #include <fstream>
 #include <sstream>
+
+#include "../Events/KeyPressedEvent.h"
+#include "../Systems/KeyboardMovementSystem.h"
 
 
 Game::Game() {
@@ -41,8 +45,8 @@ void Game::Initialize() {
 		return;
 	}
 
-	windowWidth = displayBounds.w ;
-	windowHeight = displayBounds.h ;
+	windowWidth = displayBounds.w/2 ;
+	windowHeight = displayBounds.h/2 ;
 
 	std::cout << windowWidth << std::endl;
 	window = SDL_CreateWindow(
@@ -124,6 +128,7 @@ void Game::LoadLevel(int level) {
 	registry->AddSystem<CollisionSystem>();
 	registry->AddSystem<RenderCollisionSystem>();
 	registry->AddSystem<DamageSystem>();
+	registry->AddSystem<KeyboardMovementSystem>();
 
 	assetStore->AddTexture(renderer,"tank-image", "../assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer,"truck-image", "../assets/images/truck-ford-right.png");
@@ -194,6 +199,7 @@ void Game::ProcessInput() {
 				isRunning = false;
 				break;
 			case SDL_KEYDOWN:
+				eventBus->EmitEvent<KeyPressedEvent>(sdlEvent.key.keysym.sym);
 				if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) {
 					isRunning = false;
 				}
@@ -222,13 +228,14 @@ void Game::Update() {
 
 	// Subscription to all systems
 	registry->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
-
+	registry->GetSystem<KeyboardMovementSystem>().SubscribeToEvents(eventBus);
 
 
 	//Ask registry to update a movement system
 	registry->GetSystem<MovementSystem>().Update(deltaTime);
 	registry->GetSystem<AnimationSystem>().Update();
 	registry->GetSystem<CollisionSystem>().Update(eventBus);
+
 
 
 
