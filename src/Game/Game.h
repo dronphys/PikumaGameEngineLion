@@ -9,7 +9,7 @@
 #include "../ECS/Registry.h"
 #include <memory>
 #include "../AssetStore/AssetStore.h"
-
+#include "../EventBus/EventBus.h"
 #define MY_PROJECT_PATH "E:/dev/PikumaGameEngine/PikumaGameEngine"
 
 const int FPS = 120;
@@ -26,6 +26,7 @@ private:
 	SDL_Renderer* renderer;
 	std::unique_ptr<Registry> registry;
 	std::unique_ptr<AssetStore> assetStore;
+	std::unique_ptr<EventBus> eventBus;
 
 public:
 	Game();

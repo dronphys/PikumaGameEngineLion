@@ -8,6 +8,9 @@
 #include "../ECS/ECS.h"
 #include <algorithm>
 #include "../Logger/Logger.h"
+#include "../EventBus/EventBus.h"
+#include "../Events/CollisionEvent.h"
+
 class CollisionSystem: public System {
 public:
     CollisionSystem() {
@@ -15,7 +18,7 @@ public:
         RequireComponent<TransformComponent>();
     }
 
-    void Update() {
+    void Update(std::unique_ptr<EventBus>& eventBus) {
         // check all collision of entities with all other entities
         auto entities = GetSystemEntities();
         auto entity1It = entities.begin();
@@ -34,7 +37,8 @@ public:
                 Entity e2 = *entity2It;
                 if (e1==e2) continue;
                 if (checkAABBCollision(e1,e2)) {
-                    ResolveCollision(e1,e2);
+                    //ResolveCollision(e1,e2);
+                    eventBus->EmitEvent<CollisionEvent>(e1,e2);
                 }
 
             }
@@ -77,54 +81,6 @@ public:
         b.RemoveComponent<BoxColliderComponent>();
         //Logger::Log("Entity " + std::to_string(a.GetId()) +  " collides with entity " + std::to_string(b.GetId()));
     }
-    //     auto aPosition = a.GetComponent<TransformComponent>().position;
-    //     auto bPosition = b.GetComponent<TransformComponent>().position;
-    //     auto aOffset = a.GetComponent<BoxColliderComponent>().offset;
-    //     auto bOffset = b.GetComponent<BoxColliderComponent>().offset;
-    //     auto aWidth = a.GetComponent<BoxColliderComponent>().width;
-    //     auto bWidth = b.GetComponent<BoxColliderComponent>().width;
-    //     auto aHeight = a.GetComponent<BoxColliderComponent>().height;
-    //     auto bHeight = b.GetComponent<BoxColliderComponent>().height;
-    //     int aMinX = aPosition.x + aOffset.x;
-    //     int aMinY = aPosition.y + aOffset.y;
-    //
-    //     int bMinX = bPosition.x + bOffset.x;
-    //     int bMinY = bPosition.y + bOffset.y;
-    //     int aMaxX = aMinX + aWidth;
-    //     int aMaxY = aMinY + aHeight;
-    //     int bMaxX = bMinX + bWidth;
-    //     int bMaxY = bMinY + bHeight;
-    //
-    //
-    //     int overlapX1 = aMaxX - bMinX;
-    //     int overlapX2 = aMaxX - aMinX;
-    //     int overlapY1 = aMaxY - bMinY;
-    //     int overlapY2 = aMaxY - aMinY;
-    //
-    //     auto penetrationX = std::min(overlapX1, overlapX2);
-    //     auto penetrationY = std::min(overlapY1, overlapY2);
-    //
-    //     if (penetrationX < penetrationY) {
-    //         if (overlapX1 < overlapX2) {
-    //             a.GetComponent<TransformComponent>().position.x -= penetrationX;
-    //             b.GetComponent<TransformComponent>().position.x += penetrationX;
-    //         }
-    //         else {
-    //             a.GetComponent<TransformComponent>().position.x += penetrationX;
-    //             b.GetComponent<TransformComponent>().position.x -= penetrationX;
-    //         }
-    //     }
-    //     else {
-    //         if (overlapY1 < overlapY2 ) {
-    //             a.GetComponent<TransformComponent>().position.y += penetrationY;
-    //             b.GetComponent<TransformComponent>().position.y -= penetrationY;
-    //         }
-    //         else {
-    //             a.GetComponent<TransformComponent>().position.y -= penetrationY;
-    //             b.GetComponent<TransformComponent>().position.y += penetrationY;
-    //         }
-    //     }
-    // }
 };
 
 #endif //COLLISIONSYSTEM_H

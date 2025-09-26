@@ -26,7 +26,11 @@ add_executable(${PROJECT_NAME} src/Main.cpp
         src/Systems/AnimationSystem.h
         src/Components/BoxColliderComponent.h
         src/Systems/CollisionSystem.h
-        src/Systems/RenderCollisionSystem.h)
+        src/Systems/RenderCollisionSystem.h
+        src/Events/CollisionEvent.h
+        src/EventBus/EventBus.h
+        src/EventBus/Event.h
+        src/Systems/DamageSystem.h)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/SDL2/include)
