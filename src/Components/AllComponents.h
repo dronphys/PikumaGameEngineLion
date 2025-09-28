@@ -9,4 +9,5 @@
 #include "TransformComponent.h"
 #include "AnimationComponent.h"
 #include "BoxColliderComponent.h"
+#include "KeyboardControlledComponent.h"
 #endif //ALLCOMPONENTS_H

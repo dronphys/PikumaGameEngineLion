@@ -32,7 +32,8 @@ add_executable(${PROJECT_NAME} src/Main.cpp
         src/EventBus/Event.h
         src/Systems/DamageSystem.h
         src/Systems/KeyboardMovementSystem.h
-        src/Events/KeyPressedEvent.h)
+        src/Events/KeyPressedEvent.h
+        src/Components/KeyboardControlledComponent.h)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/SDL2/include)
