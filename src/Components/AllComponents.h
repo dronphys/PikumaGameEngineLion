@@ -10,4 +10,5 @@
 #include "AnimationComponent.h"
 #include "BoxColliderComponent.h"
 #include "KeyboardControlledComponent.h"
+#include "CameraFollowComponent.h"
 #endif //ALLCOMPONENTS_H
