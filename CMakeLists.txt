@@ -35,7 +35,9 @@ add_executable(${PROJECT_NAME} src/Main.cpp
         src/Events/KeyPressedEvent.h
         src/Components/KeyboardControlledComponent.h
         src/Components/CameraFollowComponent.h
-        src/Systems/CameraMovementSystem.h)
+        src/Systems/CameraMovementSystem.h
+        src/Components/ProjectileEmitterComponent.h
+        src/Systems/ProjectileEmitSystem.h)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/SDL2/include)

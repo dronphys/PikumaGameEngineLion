@@ -11,6 +11,7 @@
 #include "../Systems/DamageSystem.h"
 #include "../Systems/RenderCollisionSystem.h"
 #include "../Systems/CameraMovementSystem.h"
+#include "../Systems/ProjectileEmitSystem.h"
 #include "../Components/AllComponents.h"
 #include "../Events/KeyPressedEvent.h"
 #include <fstream>
@@ -137,12 +138,14 @@ void Game::LoadLevel(int level) {
 	registry->AddSystem<DamageSystem>();
 	registry->AddSystem<KeyboardMovementSystem>();
 	registry->AddSystem<CameraMovementSystem>();
+	registry->AddSystem<ProjectileEmitSystem>();
 
 	assetStore->AddTexture(renderer,"tank-image", "../assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer,"truck-image", "../assets/images/truck-ford-right.png");
 	assetStore->AddTexture(renderer, "tilemap-image", "../assets/tilemaps/jungle.png");
 	assetStore->AddTexture(renderer,"chopper-image", "../assets/images/chopper-spritesheet.png");
 	assetStore->AddTexture(renderer,"radar-image", "../assets/images/radar.png");
+	assetStore->AddTexture(renderer,"bullet-image", "../assets/images/bullet.png");
 	LoadLevelFromFile("../assets/tilemaps/jungle.map");
 
 	Entity tank = registry->CreateEntity();
@@ -152,8 +155,9 @@ void Game::LoadLevel(int level) {
 		,glm::vec2(2.0, 2.0)
 		,0.0);
 	tank.AddComponent<SpriteComponent>("tank-image",32,32,2);
-	tank.AddComponent<RigidBodyComponent>(glm::vec2(30.0,0.0));
+	tank.AddComponent<RigidBodyComponent>(glm::vec2(00.0,0.0));
 	tank.AddComponent<BoxColliderComponent>(64,64);
+	tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(-2.0,00.0));
 
 	Entity truck = registry->CreateEntity();
 	// add components
@@ -162,9 +166,11 @@ void Game::LoadLevel(int level) {
 		,glm::vec2(2.0, 2.0)
 		,0.0);
 	truck.AddComponent<SpriteComponent>("truck-image",32,32,1);
-	truck.AddComponent<RigidBodyComponent>(glm::vec2(-40.0,0.0));
+	truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0,0.0));
 	truck.AddComponent<BoxColliderComponent>(64,64);
+	truck.AddComponent<ProjectileEmitterComponent>(glm::vec2(10.0,00.0));
 
+	// Choper is a player
 	Entity chopper = registry->CreateEntity();
 	// add components
 	chopper.AddComponent<TransformComponent>(
@@ -250,6 +256,7 @@ void Game::Update() {
 	registry->GetSystem<AnimationSystem>().Update();
 	registry->GetSystem<CollisionSystem>().Update(eventBus);
 	registry->GetSystem<CameraMovementSystem>().Update(camera);
+	registry->GetSystem<ProjectileEmitSystem>().Update(*registry);
 
 
 	registry->Update();
@@ -261,7 +268,7 @@ void Game::Render() {
 
 	registry->GetSystem<RenderSystem>().Update(renderer,assetStore,camera);
 	if (isDebug) {
-		registry->GetSystem<RenderCollisionSystem>().Update(renderer);
+		registry->GetSystem<RenderCollisionSystem>().Update(renderer,camera);
 	}
 	SDL_RenderPresent(renderer);
 }

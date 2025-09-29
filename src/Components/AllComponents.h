@@ -11,4 +11,5 @@
 #include "BoxColliderComponent.h"
 #include "KeyboardControlledComponent.h"
 #include "CameraFollowComponent.h"
+#include "ProjectileEmitterComponent.h"
 #endif //ALLCOMPONENTS_H

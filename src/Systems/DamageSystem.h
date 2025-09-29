@@ -20,10 +20,10 @@ public:
     }
 
     void OnCollision(CollisionEvent& event) {
-        Logger::Log("Damage system received a a collision between entities " +
-            std::to_string(event.a.GetId()) + " and " + std::to_string(event.b.GetId()));
-        event.a.Kill();
-        event.b.Kill();
+        //Logger::Log("Damage system received a a collision between entities " +
+        //    std::to_string(event.a.GetId()) + " and " + std::to_string(event.b.GetId()));
+        //event.a.Kill();
+        //event.b.Kill();
     }
 
     void Update() {}
