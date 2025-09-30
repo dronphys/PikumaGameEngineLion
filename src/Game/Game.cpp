@@ -17,9 +17,10 @@
 #include <fstream>
 #include <sstream>
 
+#include "../Components/HealthComponent.h"
 #include "../Events/KeyPressedEvent.h"
 #include "../Systems/KeyboardMovementSystem.h"
-
+#include "../Systems/LifeSpanSystem.h"
 
 Game::Game() {
 	isRunning = false;
@@ -139,6 +140,7 @@ void Game::LoadLevel(int level) {
 	registry->AddSystem<KeyboardMovementSystem>();
 	registry->AddSystem<CameraMovementSystem>();
 	registry->AddSystem<ProjectileEmitSystem>();
+	registry->AddSystem<LifeSpanSystem>();
 
 	assetStore->AddTexture(renderer,"tank-image", "../assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer,"truck-image", "../assets/images/truck-ford-right.png");
@@ -157,7 +159,8 @@ void Game::LoadLevel(int level) {
 	tank.AddComponent<SpriteComponent>("tank-image",32,32,2);
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(00.0,0.0));
 	tank.AddComponent<BoxColliderComponent>(64,64);
-	tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(-2.0,00.0));
+	tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(-200.0,00.0), 2000, 1000);
+	tank.AddComponent<HealthComponent>(100);
 
 	Entity truck = registry->CreateEntity();
 	// add components
@@ -168,7 +171,8 @@ void Game::LoadLevel(int level) {
 	truck.AddComponent<SpriteComponent>("truck-image",32,32,1);
 	truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0,0.0));
 	truck.AddComponent<BoxColliderComponent>(64,64);
-	truck.AddComponent<ProjectileEmitterComponent>(glm::vec2(10.0,00.0));
+	truck.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0,00.0), 1000, 2000);
+	truck.AddComponent<HealthComponent>(100);
 
 	// Choper is a player
 	Entity chopper = registry->CreateEntity();
@@ -186,6 +190,7 @@ void Game::LoadLevel(int level) {
 		glm::vec2(0.0, 100.0),
 		glm::vec2(-100.0, 0.0));
 	chopper.AddComponent<CameraFollowComponent>();
+	chopper.AddComponent<HealthComponent>(100);
 
 	Entity radar = registry->CreateEntity();
 	// add components
@@ -257,7 +262,7 @@ void Game::Update() {
 	registry->GetSystem<CollisionSystem>().Update(eventBus);
 	registry->GetSystem<CameraMovementSystem>().Update(camera);
 	registry->GetSystem<ProjectileEmitSystem>().Update(*registry);
-
+	registry->GetSystem<LifeSpanSystem>().Update();
 
 	registry->Update();
 }

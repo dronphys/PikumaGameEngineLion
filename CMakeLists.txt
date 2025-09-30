@@ -37,7 +37,12 @@ add_executable(${PROJECT_NAME} src/Main.cpp
         src/Components/CameraFollowComponent.h
         src/Systems/CameraMovementSystem.h
         src/Components/ProjectileEmitterComponent.h
-        src/Systems/ProjectileEmitSystem.h)
+        src/Systems/ProjectileEmitSystem.h
+        src/Components/HealthComponent.h
+        src/Components/ProjectileComponent.h
+        src/Components/LifeSpanComponent.h
+        src/Components/LifeSpanComponent.h
+        src/Systems/LifeSpanSystem.h)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/SDL2/include)

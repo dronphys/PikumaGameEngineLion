@@ -12,4 +12,7 @@
 #include "KeyboardControlledComponent.h"
 #include "CameraFollowComponent.h"
 #include "ProjectileEmitterComponent.h"
+#include "HealthComponent.h"
+#include "ProjectileComponent.h"
+#include "LifeSpanComponent.h"
 #endif //ALLCOMPONENTS_H

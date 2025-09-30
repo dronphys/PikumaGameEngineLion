@@ -6,6 +6,7 @@
 #define PROJECTILEEMITSYSTEM_H
 #include "../Components/AllComponents.h"
 #include <SDL.h>
+#include "../Components/LifeSpanComponent.h"
 class ProjectileEmitSystem: public System {
 public:
     ProjectileEmitSystem() {
@@ -14,10 +15,10 @@ public:
     }
     void Update(Registry& registry) {
         for (auto entity: GetSystemEntities()) {
-            auto& projectileComponent  = entity.GetComponent<ProjectileEmitterComponent>();
+            auto& projectileEmitterComponent  = entity.GetComponent<ProjectileEmitterComponent>();
             const auto& transformComponent = entity.GetComponent<TransformComponent>();
 
-            if (SDL_GetTicks() - projectileComponent.lastEmissionTime > projectileComponent.repeatFrequency) {
+            if (SDL_GetTicks() - projectileEmitterComponent.lastEmissionTime > projectileEmitterComponent.repeatFrequency) {
                 auto projectile = registry.CreateEntity();
                 glm::vec2 projectilePosition = transformComponent.position;
                 if (entity.HasComponent<SpriteComponent>()) {
@@ -30,11 +31,13 @@ public:
                 projectile.AddComponent<TransformComponent>(
                     projectilePosition, glm::vec2(1.0,1.0),
                     0);
-                projectile.AddComponent<RigidBodyComponent>(projectileComponent.projectileVelocity);
+                projectile.AddComponent<RigidBodyComponent>(projectileEmitterComponent.projectileVelocity);
                 projectile.AddComponent<SpriteComponent>("bullet-image",4,4,4);
                 projectile.AddComponent<BoxColliderComponent>(4,4);
+                projectile.AddComponent<ProjectileComponent>(projectileEmitterComponent.isFriendly,projectileEmitterComponent.hitPercentDamage);
+                projectile.AddComponent<LifeSpanComponent>(projectileEmitterComponent.projectileDuration);
 
-                projectileComponent.lastEmissionTime = SDL_GetTicks();
+                projectileEmitterComponent.lastEmissionTime = SDL_GetTicks();
             }
         }
     }
