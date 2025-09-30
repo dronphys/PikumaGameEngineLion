@@ -7,7 +7,7 @@
 #include <glm/glm.hpp>
 #include <SDL.h>
 struct ProjectileEmitterComponent {
-    glm::vec2 projectileVelocity;
+    int projectileSpeed;
     int repeatFrequency; // in ms
     int projectileDuration; // in ms for how many seconds the projectile is alive
     int hitPercentDamage;
@@ -15,13 +15,13 @@ struct ProjectileEmitterComponent {
     int lastEmissionTime;
 
     ProjectileEmitterComponent
-    ( glm::vec2 projectileVelocity = glm::vec2(0.0f)
+    ( int projectileSpeed = 150
     , int repeatFrequency = 3000
     , int projectileDuration = 5000
     , int hitPercentDamage = 10
     , bool isFriendly = false
     )
-    : projectileVelocity(projectileVelocity)
+    : projectileSpeed(projectileSpeed)
     , repeatFrequency(repeatFrequency)
     , projectileDuration(projectileDuration)
     , hitPercentDamage(hitPercentDamage)

@@ -13,10 +13,11 @@
 
 class KeyboardMovementSystem: public System {
 public:
-    KeyboardMovementSystem() {
+    KeyboardMovementSystem(){
         RequireComponent<KeyboardControlledComponent>();
         RequireComponent<SpriteComponent>();
         RequireComponent<RigidBodyComponent>();
+        RequireComponent<TransformComponent>();
     }
 
     void SubscribeToEvents(std::unique_ptr<EventBus>& eventBus) {
@@ -27,25 +28,28 @@ public:
             const auto keyboardControl = entity.GetComponent<KeyboardControlledComponent>();
             auto& sprite = entity.GetComponent<SpriteComponent>();
             auto& rigidBody = entity.GetComponent<RigidBodyComponent>();
+            const auto& transform = entity.GetComponent<TransformComponent>();
 
             switch (event.symbol) {
                 case SDLK_UP:
                     rigidBody.velocity = keyboardControl.upVelocity;
                     sprite.srcRect.y = sprite.height * 0;
+
                     break;
                 case SDLK_RIGHT:
                     rigidBody.velocity = keyboardControl.rightVelocity;
                     sprite.srcRect.y = sprite.height * 1;
+
                     break;
                 case SDLK_DOWN:
                     rigidBody.velocity = keyboardControl.downVelocity;
                     sprite.srcRect.y = sprite.height * 2;
+
                     break;
                 case SDLK_LEFT:
                     rigidBody.velocity = keyboardControl.leftVelocity;
                     sprite.srcRect.y = sprite.height * 3;
                     break;
-
             }
         }
     }

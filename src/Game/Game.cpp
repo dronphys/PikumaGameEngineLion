@@ -159,7 +159,7 @@ void Game::LoadLevel(int level) {
 	tank.AddComponent<SpriteComponent>("tank-image",32,32,2);
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(00.0,0.0));
 	tank.AddComponent<BoxColliderComponent>(64,64);
-	tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(-200.0,00.0), 2000, 1000);
+	tank.AddComponent<ProjectileEmitterComponent>(300, 2000, 1000);
 	tank.AddComponent<HealthComponent>(100);
 
 	Entity truck = registry->CreateEntity();
@@ -171,7 +171,7 @@ void Game::LoadLevel(int level) {
 	truck.AddComponent<SpriteComponent>("truck-image",32,32,1);
 	truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0,0.0));
 	truck.AddComponent<BoxColliderComponent>(64,64);
-	truck.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0,00.0), 1000, 2000);
+	truck.AddComponent<ProjectileEmitterComponent>(200, 1000, 2000);
 	truck.AddComponent<HealthComponent>(100);
 
 	// Choper is a player
@@ -191,6 +191,7 @@ void Game::LoadLevel(int level) {
 		glm::vec2(-100.0, 0.0));
 	chopper.AddComponent<CameraFollowComponent>();
 	chopper.AddComponent<HealthComponent>(100);
+	chopper.AddComponent<ProjectileEmitterComponent>(200, 0, 3000, 0, true);
 
 	Entity radar = registry->CreateEntity();
 	// add components
@@ -231,6 +232,11 @@ void Game::ProcessInput() {
 				if (sdlEvent.key.keysym.sym == SDLK_d) {
 					isDebug = !isDebug;
 				}
+				if (sdlEvent.key.keysym.sym == SDLK_SPACE) {
+					auto projectile = registry->CreateEntity();
+
+
+				}
 				break;
 		}
 	}
@@ -254,6 +260,7 @@ void Game::Update() {
 	// Subscription to all systems
 	registry->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
 	registry->GetSystem<KeyboardMovementSystem>().SubscribeToEvents(eventBus);
+	registry->GetSystem<ProjectileEmitSystem>().SubscribeToEvents(eventBus);
 
 
 	//Ask registry to update a movement system
