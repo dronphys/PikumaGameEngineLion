@@ -25,6 +25,22 @@ bool Entity::operator<(Entity other) const {
     return this->id < other.id;
 }
 
+void Entity::Tag(const std::string &tag) {
+    registry->TagEntity(*this, tag);
+}
+
+bool Entity::HasTag(const std::string &tag) const {
+    return registry->EntityHasTag(*this, tag);
+}
+
+void Entity::Group(const std::string &group) {
+    registry->GroupEntity(*this, group);
+}
+
+bool Entity::InGroup(const std::string &group) const {
+    return registry->EntityInGroup(*this, group);
+}
+
 void System::AddEntityToSystem(Entity entity) {
     entities.push_back(entity);
 }

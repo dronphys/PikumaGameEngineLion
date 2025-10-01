@@ -25,8 +25,8 @@ private:
 public:
     Registry* registry;
 
-    Entity(int id_)
-        :id(id_){};
+    Entity(int id_) :id(id_) {
+    };
 
     void Kill();
     int GetId() const;
@@ -45,6 +45,11 @@ public:
 
     template <typename TComponent>
     TComponent& GetComponent() const;
+
+    void Tag(const std::string& tag);
+    bool HasTag(const std::string& tag) const;
+    void Group(const std::string& group);
+    bool InGroup(const std::string& group) const;
 };
 
 struct IComponent {

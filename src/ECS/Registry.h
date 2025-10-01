@@ -33,10 +33,20 @@ private:
     //set of entities to be created
     std::set<Entity> entitiesToBeAdded;
     std::set<Entity> entitiesToBeKilled;
-
     std::vector<std::pair<Entity,std::shared_ptr<System>>> entitiesToBeRemovedFromSystems;
 
+    // Entity tags
+    std::unordered_map<std::string, Entity> entityPerTag;
+    std::unordered_map<int, std::string> tagPerEntity;
+
+    //Entity groups
+    std::unordered_map<std::string, std::set<Entity>> entitiesPerGroup;
+    std::unordered_map<int, std::string> groupPerEntity;
+
+
     std::deque<int> freeIds;
+
+
 
 public:
     Registry() = default;
@@ -73,6 +83,19 @@ public:
     // that are interested in it
     void AddEntityToSystems(Entity entity);
     void RemoveEntityFromSystems(Entity entity);
+
+    // Entity tag management
+    void TagEntity(Entity entity, const std::string& tag);
+    bool EntityHasTag(Entity entity, const std::string& tag) const;
+    Entity GetEntityByTag(const std::string& tag) const;
+    void RemoveEntityTag(Entity entity);
+
+    // Entity group management
+    void GroupEntity(Entity entity, const std::string& group);
+    bool EntityInGroup(Entity entity, const std::string& group) const;
+    std::vector<Entity> GetEntitiesByGroup(const std::string& group) const;
+    void RemoveEntityGroup(Entity entity);
+
 };
 
 

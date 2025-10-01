@@ -43,6 +43,9 @@ void Registry::Update() {
         entityComponentSignatures[entity.GetId()].reset();
 
         freeIds.push_back(entity.GetId());
+
+        RemoveEntityTag(entity);
+        RemoveEntityGroup(entity);
     }
     entitiesToBeKilled.clear();
 
@@ -50,6 +53,9 @@ void Registry::Update() {
         system->RemoveEntityFromSystem(entity);
     }
     entitiesToBeRemovedFromSystems.clear();
+
+    // remove any traces of entity in groups and tags
+
 }
 
 void Registry::AddEntityToSystems(Entity entity) {
@@ -68,5 +74,61 @@ void Registry::AddEntityToSystems(Entity entity) {
 void Registry::RemoveEntityFromSystems(Entity entity) {
     for (auto& [id,system]: systems) {
         system->RemoveEntityFromSystem(entity);
+    }
+}
+
+void Registry::TagEntity(Entity entity, const std::string &tag) {
+    entityPerTag.emplace(tag, entity);
+    tagPerEntity.emplace(entity.GetId(), tag);
+}
+
+bool Registry::EntityHasTag(Entity entity, const std::string &tag) const {
+    if (tagPerEntity.find(entity.GetId()) == tagPerEntity.end()) {
+        return false;
+    }
+    return entityPerTag.find(tag)->second == entity;
+}
+
+Entity Registry::GetEntityByTag(const std::string &tag) const {
+    return entityPerTag.at(tag);
+}
+
+void Registry::RemoveEntityTag(Entity entity) {
+    auto taggedEntity = tagPerEntity.find(entity.GetId());
+    if (taggedEntity != tagPerEntity.end()) {
+        auto tag = taggedEntity->second;
+        entityPerTag.erase(tag);
+        tagPerEntity.erase(taggedEntity);
+    }
+}
+
+void Registry::GroupEntity(Entity entity, const std::string &group) {
+    entitiesPerGroup.emplace(group, std::set<Entity>());
+    entitiesPerGroup[group].emplace(entity);
+    groupPerEntity.emplace(entity.GetId(), group);
+}
+
+bool Registry::EntityInGroup(Entity entity, const std::string &group) const {
+    auto groupEntities = entitiesPerGroup.at(group);
+    return groupEntities.find(entity.GetId()) != groupEntities.end();
+
+}
+
+std::vector<Entity> Registry::GetEntitiesByGroup(const std::string &group) const {
+    auto setOfEntites = entitiesPerGroup.at(group);
+    std::vector<Entity> entities;
+    entities.reserve(setOfEntites.size());
+    entities.insert(entities.end(), setOfEntites.begin(), setOfEntites.end());
+    return entities;
+
+}
+
+// here might be a problem. Not how gustavo implemented
+void Registry::RemoveEntityGroup(Entity entity) {
+    auto groupedEntity = groupPerEntity.find(entity.GetId());
+    if (groupedEntity != groupPerEntity.end()) {
+        auto groupName = groupedEntity->second;
+        entitiesPerGroup.find(groupName)->second.erase(entity);
+        groupPerEntity.erase(groupedEntity);
     }
 }
