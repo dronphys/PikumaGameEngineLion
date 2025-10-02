@@ -96,6 +96,8 @@ public:
     std::vector<Entity> GetEntitiesByGroup(const std::string& group) const;
     void RemoveEntityGroup(Entity entity);
 
+    std::string GetEntityTag(Entity entity) const;
+
 };
 
 

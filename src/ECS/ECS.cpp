@@ -41,6 +41,10 @@ bool Entity::InGroup(const std::string &group) const {
     return registry->EntityInGroup(*this, group);
 }
 
+std::string Entity::GetTag() const {
+    return registry->GetEntityTag(*this);
+}
+
 void System::AddEntityToSystem(Entity entity) {
     entities.push_back(entity);
 }

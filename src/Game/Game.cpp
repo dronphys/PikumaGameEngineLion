@@ -124,6 +124,7 @@ void Game::LoadLevelFromFile(const std::string& fileName) {
 				glm::vec2(tileScale, tileScale),
 				0.0);
 			tile.AddComponent<SpriteComponent>("tilemap-image",tileSize, tileSize,0, false, srcRectX, srcRectY);
+			tile.Group("tile");
 		}
 	}
 
@@ -151,6 +152,8 @@ void Game::LoadLevel(int level) {
 	LoadLevelFromFile("../assets/tilemaps/jungle.map");
 
 	Entity tank = registry->CreateEntity();
+	tank.Group("enemies");
+	tank.Tag("tank");
 	// add components
 	tank.AddComponent<TransformComponent>(
 		 glm::vec2(100.0,00.0)
@@ -159,10 +162,12 @@ void Game::LoadLevel(int level) {
 	tank.AddComponent<SpriteComponent>("tank-image",32,32,2);
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(00.0,0.0));
 	tank.AddComponent<BoxColliderComponent>(64,64);
-	tank.AddComponent<ProjectileEmitterComponent>(300, 2000, 1000);
+	tank.AddComponent<ProjectileEmitterComponent>(300, 2000, 1000,10);
 	tank.AddComponent<HealthComponent>(100);
 
 	Entity truck = registry->CreateEntity();
+	truck.Group("enemies");
+	truck.Tag("truck");
 	// add components
 	truck.AddComponent<TransformComponent>(
 		 glm::vec2(250.0,00.0)
@@ -171,11 +176,12 @@ void Game::LoadLevel(int level) {
 	truck.AddComponent<SpriteComponent>("truck-image",32,32,1);
 	truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0,0.0));
 	truck.AddComponent<BoxColliderComponent>(64,64);
-	truck.AddComponent<ProjectileEmitterComponent>(200, 1000, 2000);
+	truck.AddComponent<ProjectileEmitterComponent>(200, 1000, 2000,20);
 	truck.AddComponent<HealthComponent>(100);
 
 	// Choper is a player
 	Entity chopper = registry->CreateEntity();
+	chopper.Tag("player");
 	// add components
 	chopper.AddComponent<TransformComponent>(
 		 glm::vec2(600.0,00.0)
@@ -191,7 +197,9 @@ void Game::LoadLevel(int level) {
 		glm::vec2(-100.0, 0.0));
 	chopper.AddComponent<CameraFollowComponent>();
 	chopper.AddComponent<HealthComponent>(100);
-	chopper.AddComponent<ProjectileEmitterComponent>(200, 0, 3000, 0, true);
+	chopper.AddComponent<ProjectileEmitterComponent>(200, 0, 3000, 10, true);
+	chopper.AddComponent<BoxColliderComponent>(64,64);
+
 
 	Entity radar = registry->CreateEntity();
 	// add components

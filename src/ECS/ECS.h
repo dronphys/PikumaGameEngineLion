@@ -50,6 +50,7 @@ public:
     bool HasTag(const std::string& tag) const;
     void Group(const std::string& group);
     bool InGroup(const std::string& group) const;
+    std::string GetTag() const;
 };
 
 struct IComponent {

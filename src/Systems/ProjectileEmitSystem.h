@@ -20,7 +20,7 @@ public:
     }
     void OnKeyPressed(KeyPressedEvent& event) {
         for (auto entity: GetSystemEntities()) {
-            if (!entity.HasComponent<CameraFollowComponent>()) continue;
+            if (!entity.HasTag("player")){continue;}
 
             if (event.symbol == SDLK_SPACE) {
                 ShootProjectile(entity);
@@ -62,6 +62,7 @@ public:
             projectilePosition.y += spriteComponent.height * transformC.scale.y * 0.5f;
         }
         auto projectile = entity.registry->CreateEntity();
+        projectile.Group("projectiles");
         projectile.AddComponent<TransformComponent>(projectilePosition, glm::vec2(1.0,1.0),0);
         projectile.AddComponent<RigidBodyComponent>(projectileVelocity);
         projectile.AddComponent<SpriteComponent>("bullet-image",4,4,4);

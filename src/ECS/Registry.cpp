@@ -86,6 +86,9 @@ bool Registry::EntityHasTag(Entity entity, const std::string &tag) const {
     if (tagPerEntity.find(entity.GetId()) == tagPerEntity.end()) {
         return false;
     }
+    if (entityPerTag.find(tag) == entityPerTag.end()) {
+        return false;
+    }
     return entityPerTag.find(tag)->second == entity;
 }
 
@@ -109,8 +112,12 @@ void Registry::GroupEntity(Entity entity, const std::string &group) {
 }
 
 bool Registry::EntityInGroup(Entity entity, const std::string &group) const {
-    auto groupEntities = entitiesPerGroup.at(group);
-    return groupEntities.find(entity.GetId()) != groupEntities.end();
+    auto groupEntities = entitiesPerGroup.find(group);
+    if (groupEntities != entitiesPerGroup.end()) {
+        return groupEntities->second.find(entity.GetId()) != groupEntities->second.end();
+    }
+    // auto groupEntities = entitiesPerGroup.at(group);
+    // return groupEntities.find(entity.GetId()) != groupEntities.end();
 
 }
 
@@ -131,4 +138,11 @@ void Registry::RemoveEntityGroup(Entity entity) {
         entitiesPerGroup.find(groupName)->second.erase(entity);
         groupPerEntity.erase(groupedEntity);
     }
+}
+
+std::string Registry::GetEntityTag(Entity entity) const {
+    if (tagPerEntity.find(entity.GetId()) != tagPerEntity.end()) {
+        return tagPerEntity.find(entity.GetId())->second;
+    }
+    return "no tag";
 }
