@@ -25,15 +25,11 @@ public:
         Logger::Log("Damage system received a  collision between entities " +
             std::to_string(a.GetId()) + " and " + std::to_string(b.GetId()));
 
-
-        std::cout << a.GetTag() << " " << b.GetTag() << std::endl;
         if (a.InGroup("projectiles")&& b.HasTag("player")) {
             OnProjectileHitsPlayer(a,b); // a is projectile b is the player
-            std::cout << "player hit" << std::endl;
         }
         if (b.InGroup("projectiles")&& a.HasTag("player")) {
             OnProjectileHitsPlayer(b,a); // b is the projectile a is the player
-            std::cout << "player hit" << std::endl;
         }
 
         if (a.InGroup("projectiles")&& b.InGroup("enemies")) {

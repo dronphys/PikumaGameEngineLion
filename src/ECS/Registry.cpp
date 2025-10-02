@@ -116,9 +116,7 @@ bool Registry::EntityInGroup(Entity entity, const std::string &group) const {
     if (groupEntities != entitiesPerGroup.end()) {
         return groupEntities->second.find(entity.GetId()) != groupEntities->second.end();
     }
-    // auto groupEntities = entitiesPerGroup.at(group);
-    // return groupEntities.find(entity.GetId()) != groupEntities.end();
-
+    return false;
 }
 
 std::vector<Entity> Registry::GetEntitiesByGroup(const std::string &group) const {
