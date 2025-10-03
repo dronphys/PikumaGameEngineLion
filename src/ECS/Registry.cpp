@@ -39,8 +39,16 @@ void Registry::Update() {
 
     for (const auto entity: entitiesToBeKilled) {
         RemoveEntityFromSystems(entity);
-
         entityComponentSignatures[entity.GetId()].reset();
+        // remove entity from component pools
+
+        for (auto pool:componentPools) {
+            // to remove only of pool exists
+            if (pool) {
+                pool->RemoveEntityFromPool(entity.GetId());
+            }
+
+        }
 
         freeIds.push_back(entity.GetId());
 

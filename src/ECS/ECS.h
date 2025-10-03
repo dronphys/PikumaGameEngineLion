@@ -75,24 +75,30 @@ public:
 class IPool {
 public:
     virtual ~IPool() = default;
+    virtual void RemoveEntityFromPool(int entityId) = 0;
 };
 
 template <typename T>
 class Pool: public IPool {
 private:
     std::vector<T> data;
+    int size;
+    std::unordered_map<int, int> entityIdToIndex; // maps entity Id to index in the data[] to make it packed
+    std::unordered_map<int,int> indexToEntityId; // reversed map
+
 public:
-    Pool(int size = 100) {
-        data.resize(size);
+    Pool(int capacity = 100) {
+        size = 0;
+        data.resize(capacity);
     }
     ~Pool() override = default;
 
-    bool isEmpty() const {
-        return data.empty();
+    bool IsEmpty() const {
+        return size == 0;
     }
 
     int GetSize() const {
-        return data.size();
+        return size;
     }
 
     void Resize(int n) {
@@ -101,22 +107,58 @@ public:
 
     void Clear() {
         data.clear();
+        size = 0;
     }
 
     void Add(T object) {
         data.push_back(object);
     }
 
-    void Set(int index, T object) {
-        data[index] = std::move(object);
+    void Set(int entityId, T object) {
+        if (entityIdToIndex.find(entityId) != entityIdToIndex.end()) {
+            // if an element already exists in the list
+            int index = entityIdToIndex[entityId];
+            data[index] = object;
+        }
+        else {
+            int index = size;
+            entityIdToIndex.emplace(entityId, index);
+            indexToEntityId.emplace(index,entityId);
+            if (index >= data.capacity()) {
+                data.resize(size * 2);
+            }
+            data[index] = object;
+            size++;
+        }
+    }
+    void Remove(int entityId) {
+        int indexOfRemoved = entityIdToIndex[entityId];
+        int indexOfLast = size - 1;
+        data[indexOfRemoved] = data[indexOfLast];
+
+        // update the maps
+        int entityIdOfLastElement = indexToEntityId[indexOfLast];
+        entityIdToIndex[entityIdOfLastElement] = indexOfRemoved;
+        indexToEntityId[indexOfRemoved] = entityIdOfLastElement;
+
+        entityIdToIndex.erase(entityId);
+        indexToEntityId.erase(indexOfLast);
+
+        size--;
     }
 
-    T& Get(int index) {
-        // why here static cast? later try to remove
+    T& Get(int entityId) {
+        int index = entityIdToIndex.at(entityId);
         return static_cast<T&> (data[index]);
     }
-    T& operator[](int index) const {
+    T& operator[](int entityId) const {
+        int index = entityIdToIndex.at(entityId);
         return data[index];
+    }
+    void RemoveEntityFromPool(int entityId) override {
+        if (entityIdToIndex.find(entityId) != entityIdToIndex.end()) {
+            Remove(entityId);
+        }
     }
 };
 

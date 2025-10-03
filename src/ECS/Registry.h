@@ -116,10 +116,6 @@ void Registry::AddComponent(const Entity entity, TArgs&& ...args) {
     std::shared_ptr<Pool<TComponent>> componentPool
     = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentId]);
 
-    if (entityId >= componentPool->GetSize()) {
-        componentPool->Resize(numEntities);
-    }
-
     componentPool->Set(entityId, TComponent(std::forward<TArgs>(args)...));
 
     if (entityId >= entityComponentSignatures.size()) {
@@ -141,6 +137,10 @@ void Registry::RemoveComponent(const Entity entity) {
     const auto entityId = entity.GetId();
     entityComponentSignatures[entityId].set(componentId, false);
 
+    // remove entity from component pool
+    std::shared_ptr<Pool<TComponent>> componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentId]);
+    componentPool->Remove(entityId);
+
     // We have to remove entity from Systems if the components no longer satisfy this system
     const auto& entityComponentSignature = entityComponentSignatures[entityId];
     for (auto& [id,system]: systems) {
@@ -150,7 +150,6 @@ void Registry::RemoveComponent(const Entity entity) {
         // if entity wasn't in the system, nothing bad will happen.
         const bool notInSystem = (entityComponentSignature & systemComponentSignature) != systemComponentSignature;
         if (notInSystem) {
-
             entitiesToBeRemovedFromSystems.push_back(std::make_pair(entity, system));
         }
     }
