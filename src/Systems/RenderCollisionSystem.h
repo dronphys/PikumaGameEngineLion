@@ -21,9 +21,6 @@ public:
             auto& boxCollider = entity.GetComponent<BoxColliderComponent>();
 
             int green = 255;
-            if (boxCollider.isColliding) {
-                green = 0;
-            }
 
             SDL_SetRenderDrawColor(renderer, 255, green, 0, 100);
             SDL_Rect rect {

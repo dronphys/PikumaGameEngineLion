@@ -12,6 +12,9 @@
 #include "../Systems/RenderCollisionSystem.h"
 #include "../Systems/CameraMovementSystem.h"
 #include "../Systems/ProjectileEmitSystem.h"
+#include "../Systems/RenderTextSystem.h"
+#include "../Systems/HealtBarSystem.h"
+#include "../Systems/LinkSystem.h"
 #include "../Components/AllComponents.h"
 #include "../Events/KeyPressedEvent.h"
 #include <fstream>
@@ -39,6 +42,10 @@ Game::~Game() {
 void Game::Initialize() {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)	{
 		std::cerr<< "Error initializing SDL." << std::endl;
+		return;
+	}
+	if (TTF_Init() != 0) {
+		Logger::Err("Errror initializing SDL TTF");
 		return;
 	}
 
@@ -142,7 +149,13 @@ void Game::LoadLevel(int level) {
 	registry->AddSystem<CameraMovementSystem>();
 	registry->AddSystem<ProjectileEmitSystem>();
 	registry->AddSystem<LifeSpanSystem>();
+	registry->AddSystem<RenderTextSystem>();
+	registry->AddSystem<LinkSystem>();
+	registry->AddSystem<HealthBarSystem>();
 
+	assetStore->AddFont("charriot-font","../assets/fonts/charriot.ttf",20);
+
+	// adding textures to asset store
 	assetStore->AddTexture(renderer,"tank-image", "../assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer,"truck-image", "../assets/images/truck-ford-right.png");
 	assetStore->AddTexture(renderer, "tilemap-image", "../assets/tilemaps/jungle.png");
@@ -162,7 +175,7 @@ void Game::LoadLevel(int level) {
 	tank.AddComponent<SpriteComponent>("tank-image",32,32,2);
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(00.0,0.0));
 	tank.AddComponent<BoxColliderComponent>(64,64);
-	tank.AddComponent<ProjectileEmitterComponent>(30, 2, 1000000,10);
+	tank.AddComponent<ProjectileEmitterComponent>(30, 200, 10000,1);
 	tank.AddComponent<HealthComponent>(100);
 
 	Entity truck = registry->CreateEntity();
@@ -176,7 +189,7 @@ void Game::LoadLevel(int level) {
 	truck.AddComponent<SpriteComponent>("truck-image",32,32,1);
 	truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0,0.0));
 	truck.AddComponent<BoxColliderComponent>(64,64);
-	truck.AddComponent<ProjectileEmitterComponent>(200, 1000, 2000,20);
+	truck.AddComponent<ProjectileEmitterComponent>(200, 100, 2000,1);
 	truck.AddComponent<HealthComponent>(100);
 
 	// Choper is a player
@@ -207,10 +220,32 @@ void Game::LoadLevel(int level) {
 	radar.AddComponent<TransformComponent>(
 		 glm::vec2(1400.0,0.0)
 		,glm::vec2(1.0, 1.0)
-		,0.0);
+		,0.0,
+		true);
 	radar.AddComponent<SpriteComponent>("radar-image",64,64,1, true);
 	radar.AddComponent<AnimationComponent>(8,5);
 
+
+	Entity label = registry->CreateEntity();
+	//
+	SDL_Color white = {255,255,255};
+	SDL_Color green = {0,255,0};
+	label.AddComponent<TextLabelComponent>("THIS IS A TEXT LABEL!!!", "charriot-font",green);
+	label.AddComponent<TransformComponent>(
+		 glm::vec2(20.0,20.0)
+		,glm::vec2(1.0, 1.0)
+		,0.0,
+		true);
+
+	Entity hpLabel = registry->CreateEntity();
+	hpLabel.Group("hpBar");
+	hpLabel.AddComponent<TextLabelComponent>("Here should be hp", "charriot-font", green);
+	hpLabel.AddComponent<TransformComponent>(
+		glm::vec2(50.0,50.0),
+		glm::vec2(1.0, 1.0),
+		0.0,
+		false);
+	hpLabel.AddComponent<LinkComponent>(glm::vec2(20,-20), chopper);
 }
 
 void Game::Setup() {
@@ -288,6 +323,8 @@ void Game::Update() {
 	registry->GetSystem<CameraMovementSystem>().Update(camera);
 	registry->GetSystem<ProjectileEmitSystem>().Update(*registry);
 	registry->GetSystem<LifeSpanSystem>().Update();
+	registry->GetSystem<LinkSystem>().Update();
+	registry->GetSystem<HealthBarSystem>().Update(*registry);
 	registry->Update();
 
 }
@@ -300,6 +337,7 @@ void Game::Render() {
 	if (isDebug) {
 		registry->GetSystem<RenderCollisionSystem>().Update(renderer,camera);
 	}
+	registry->GetSystem<RenderTextSystem>().Update(renderer,assetStore,camera);
 	SDL_RenderPresent(renderer);
 }
 

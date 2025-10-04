@@ -22,12 +22,12 @@ class Entity {
 private:
     int id;
 
+
 public:
     Registry* registry;
 
     Entity(int id_) :id(id_) {
     };
-
     void Kill();
     int GetId() const;
     bool operator==(Entity other) const;

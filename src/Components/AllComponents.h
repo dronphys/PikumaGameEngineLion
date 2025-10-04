@@ -15,4 +15,6 @@
 #include "HealthComponent.h"
 #include "ProjectileComponent.h"
 #include "LifeSpanComponent.h"
+#include "TextLabelComponent.h"
+#include "LinkComponent.h"
 #endif //ALLCOMPONENTS_H

@@ -53,6 +53,10 @@ public:
 
             for (auto& otherEntity: candidates) {
                 if (entity==otherEntity) {continue;}
+
+                // so our entities colide only oce with each other.
+                if (entity.GetId() > otherEntity.GetId()) {continue;}
+
                 if (checkAABBCollision(entity, otherEntity)) {
                     // resolve collision emitting event
                     eventBus->EmitEvent<CollisionEvent>(entity,otherEntity);
@@ -91,12 +95,6 @@ public:
         return true;
     }
 
-    void ResolveCollision(Entity a, Entity b) {
-        a.GetComponent<BoxColliderComponent>().isColliding = true;
-        b.GetComponent<BoxColliderComponent>().isColliding = true;
-        b.RemoveComponent<BoxColliderComponent>();
-        //Logger::Log("Entity " + std::to_string(a.GetId()) +  " collides with entity " + std::to_string(b.GetId()));
-    }
 };
 
 #endif //COLLISIONSYSTEM_H

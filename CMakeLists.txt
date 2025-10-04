@@ -43,7 +43,13 @@ add_executable(${PROJECT_NAME} src/Main.cpp
         src/Components/LifeSpanComponent.h
         src/Components/LifeSpanComponent.h
         src/Systems/LifeSpanSystem.h
-        src/misc/QuadTree.h)
+        src/misc/QuadTree.h
+        src/Components/TextLabelComponent.h
+        src/Systems/RenderTextSystem.h
+        src/Components/LinkComponent.h
+        src/Systems/LinkSystem.h
+        src/Systems/HealtBarSystem.h
+)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/SDL2/include)

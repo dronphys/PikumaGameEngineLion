@@ -22,8 +22,8 @@ public:
     void OnCollision(CollisionEvent& event) {
         Entity a = event.a;
         Entity b = event.b;
-        Logger::Log("Damage system received a  collision between entities " +
-            std::to_string(a.GetId()) + " and " + std::to_string(b.GetId()));
+        // Logger::Log("Damage system received a  collision between entities " +
+        //     std::to_string(a.GetId()) + " and " + std::to_string(b.GetId()));
 
         if (a.InGroup("projectiles")&& b.HasTag("player")) {
             OnProjectileHitsPlayer(a,b); // a is projectile b is the player
@@ -42,6 +42,8 @@ public:
 
     void OnProjectileHitsPlayer(Entity projectile, Entity player) {
         auto projectileComponent = projectile.GetComponent<ProjectileComponent>();
+        projectile.GetComponent<BoxColliderComponent>().isColliding = true;
+        player.GetComponent<BoxColliderComponent>().isColliding = true;
         if (!projectileComponent.isFriendly) {
             auto& health = player.GetComponent<HealthComponent>();
             health.healthPercentage -= projectileComponent.hitPercentDamage;
@@ -51,9 +53,12 @@ public:
             }
             projectile.Kill();
         }
+        Logger::Log("Projectile Hits player");
     }
 
     void OnProjectileHitsEnemy(Entity projectile, Entity enemy) {
+        projectile.GetComponent<BoxColliderComponent>().isColliding = true;
+        enemy.GetComponent<BoxColliderComponent>().isColliding = true;
         auto projectileComponent = projectile.GetComponent<ProjectileComponent>();
         if (!projectileComponent.isFriendly) {
             return; // only damage enemy if projectile component was friendly/
@@ -65,6 +70,7 @@ public:
             enemy.Kill();
         }
         projectile.Kill();
+        Logger::Log("Projectile Hits enemy");
     }
 
     void Update() {}

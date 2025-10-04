@@ -51,19 +51,36 @@ public:
 
 public:
     bool Insert(Entity entity) {
+        auto& pos = entity.GetComponent<TransformComponent>().position;
+        auto& collider = entity.GetComponent<BoxColliderComponent>();
+
+        Rect entityRect(pos.x, pos.y, collider.width, collider.height);
+        if (!rect.intersects(entityRect)) {
+            return false; // entity is completely outside this node
+        }
         if (data.size() < MAX_CAPACITY) {
             data.push_back(entity);
             return true;
         }
-        isDivided = true;
-        topRight = std::make_unique<QuadTreeNode>(Rect(rect.x + rect.w/2,rect.y, rect.w/2, rect.h/2));
-        bottomRight = std::make_unique<QuadTreeNode>(Rect(rect.x + rect.w/2,rect.y + rect.h/2, rect.w/2, rect.h/2));
-        bottomLeft = std::make_unique<QuadTreeNode>(Rect(rect.x,rect.y + rect.h/2, rect.w/2, rect.h/2));
-        topLeft = std::make_unique<QuadTreeNode>(Rect(rect.x,rect.y, rect.w/2, rect.h/2));
+        if (!isDivided) {
+            Subdivide();
+        }
+        return InsertIntoChildren(entity);
+    }
+    bool InsertIntoChildren(Entity entity) {
         return (topRight->Insert(entity) ||
-            bottomRight->Insert(entity) ||
-                bottomLeft->Insert(entity)||
-                    topLeft->Insert(entity));
+                bottomRight->Insert(entity) ||
+                bottomLeft->Insert(entity) ||
+                topLeft->Insert(entity));
+    }
+    void Subdivide() {
+        float hw = rect.w / 2;
+        float hh = rect.h / 2;
+        topRight    = std::make_unique<QuadTreeNode>(Rect(rect.x + hw, rect.y, hw, hh));
+        bottomRight = std::make_unique<QuadTreeNode>(Rect(rect.x + hw, rect.y + hh, hw, hh));
+        bottomLeft  = std::make_unique<QuadTreeNode>(Rect(rect.x, rect.y + hh, hw, hh));
+        topLeft     = std::make_unique<QuadTreeNode>(Rect(rect.x, rect.y, hw, hh));
+        isDivided = true;
     }
 
     void Query(const Rect& boundary, std::vector<Entity>& found) {
@@ -71,8 +88,10 @@ public:
             return;
         }
         for (auto entity: data) {
-            auto point = entity.GetComponent<TransformComponent>().position;
-            if (rect.contains(point.x, point.y)) {
+            auto pos = entity.GetComponent<TransformComponent>().position;
+            auto& collider = entity.GetComponent<BoxColliderComponent>();
+            Rect entityRect(pos.x, pos.y, collider.width, collider.height);
+            if (boundary.intersects(entityRect)) {
                 found.push_back(entity);
             }
         }
