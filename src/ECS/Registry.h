@@ -30,10 +30,12 @@ private:
 
     std::unordered_map<std::type_index, std::shared_ptr<System>> systems;
 
-    //set of entities to be created
+    //set of entities to be created and killed in update function
     std::set<Entity> entitiesToBeAdded;
     std::set<Entity> entitiesToBeKilled;
+    // entities, from which we remove some Component and now we need to remove them from certain systems
     std::vector<std::pair<Entity,std::shared_ptr<System>>> entitiesToBeRemovedFromSystems;
+    std::vector<Entity> entitiesToBeAddedToSystems;
 
     // Entity tags
     std::unordered_map<std::string, Entity> entityPerTag;
@@ -42,11 +44,8 @@ private:
     //Entity groups
     std::unordered_map<std::string, std::set<Entity>> entitiesPerGroup;
     std::unordered_map<int, std::string> groupPerEntity;
-
-
+    // Ids freed from entities and can be used for future
     std::deque<int> freeIds;
-
-
 
 public:
     Registry() = default;
@@ -123,6 +122,11 @@ void Registry::AddComponent(const Entity entity, TArgs&& ...args) {
     }
 
     entityComponentSignatures[entityId].set(componentId);
+
+    // if we had an existent entity and adding component to it
+    // we need to add to the systems
+    entitiesToBeAddedToSystems.push_back(entity);
+
     Logger::Log("Component id = "
         + std::to_string(componentId)
         + " has been added to entity id: "
@@ -146,11 +150,11 @@ void Registry::RemoveComponent(const Entity entity) {
     for (auto& [id,system]: systems) {
         const auto& systemComponentSignature = system->GetComponentSignature();
 
-        // we check if entity is not in the system we remove this system
+        // we check if an entity is not in the system we remove this system
         // if entity wasn't in the system, nothing bad will happen.
         const bool notInSystem = (entityComponentSignature & systemComponentSignature) != systemComponentSignature;
         if (notInSystem) {
-            entitiesToBeRemovedFromSystems.push_back(std::make_pair(entity, system));
+            system->RemoveEntityFromSystem(entity);
         }
     }
 

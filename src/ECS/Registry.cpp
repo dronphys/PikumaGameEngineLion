@@ -32,11 +32,20 @@ void Registry::KillEntity(Entity entity) {
 }
 
 void Registry::Update() {
+    // new entities created
     for (const auto entity: entitiesToBeAdded) {
         AddEntityToSystems(entity);
     }
     entitiesToBeAdded.clear();
 
+    // here we add entities to systems that already existed
+    // but we added new components to them
+    for (const auto entity: entitiesToBeAddedToSystems) {
+        AddEntityToSystems(entity);
+    }
+    entitiesToBeAddedToSystems.clear();
+
+    // removing entities to be killed
     for (const auto entity: entitiesToBeKilled) {
         RemoveEntityFromSystems(entity);
         entityComponentSignatures[entity.GetId()].reset();
@@ -47,23 +56,14 @@ void Registry::Update() {
             if (pool) {
                 pool->RemoveEntityFromPool(entity.GetId());
             }
-
         }
-
         freeIds.push_back(entity.GetId());
 
+        // Remove any traces of that entity from the tag/group maps
         RemoveEntityTag(entity);
         RemoveEntityGroup(entity);
     }
     entitiesToBeKilled.clear();
-
-    for (auto& [entity, system]: entitiesToBeRemovedFromSystems) {
-        system->RemoveEntityFromSystem(entity);
-    }
-    entitiesToBeRemovedFromSystems.clear();
-
-    // remove any traces of entity in groups and tags
-
 }
 
 void Registry::AddEntityToSystems(Entity entity) {

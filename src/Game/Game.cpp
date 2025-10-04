@@ -162,7 +162,7 @@ void Game::LoadLevel(int level) {
 	tank.AddComponent<SpriteComponent>("tank-image",32,32,2);
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(00.0,0.0));
 	tank.AddComponent<BoxColliderComponent>(64,64);
-	tank.AddComponent<ProjectileEmitterComponent>(300, 2000, 1000,10);
+	tank.AddComponent<ProjectileEmitterComponent>(30, 2, 1000000,10);
 	tank.AddComponent<HealthComponent>(100);
 
 	Entity truck = registry->CreateEntity();
@@ -181,6 +181,7 @@ void Game::LoadLevel(int level) {
 
 	// Choper is a player
 	Entity chopper = registry->CreateEntity();
+	player = chopper;
 	chopper.Tag("player");
 	// add components
 	chopper.AddComponent<TransformComponent>(
@@ -240,9 +241,16 @@ void Game::ProcessInput() {
 				if (sdlEvent.key.keysym.sym == SDLK_d) {
 					isDebug = !isDebug;
 				}
-				if (sdlEvent.key.keysym.sym == SDLK_SPACE) {
-					auto projectile = registry->CreateEntity();
-
+				if (sdlEvent.key.keysym.sym == SDLK_t) {
+					if (hasColider) {
+						std::cout << "Player id = " << player.GetId() << std::endl;
+						player.RemoveComponent<BoxColliderComponent>();
+						hasColider = false;
+					}
+					else {
+						player.AddComponent<BoxColliderComponent>(64,64);
+						hasColider = true;
+					}
 
 				}
 				break;
@@ -251,6 +259,8 @@ void Game::ProcessInput() {
 }
 
 void Game::Update() {
+	// for now registry update must be the first thing we do in the new frame,
+	// otherwise, game might crash if we remove some component from entity
 
 	// we waste here time, untill time of the frame has passed
 	int timeToWait = MILLISECS_PER_FRAME - (SDL_GetTicks() - millisecsPreviousFrame);
@@ -278,8 +288,8 @@ void Game::Update() {
 	registry->GetSystem<CameraMovementSystem>().Update(camera);
 	registry->GetSystem<ProjectileEmitSystem>().Update(*registry);
 	registry->GetSystem<LifeSpanSystem>().Update();
-
 	registry->Update();
+
 }
 
 void Game::Render() {

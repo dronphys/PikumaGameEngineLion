@@ -30,6 +30,11 @@ private:
 	std::unique_ptr<AssetStore> assetStore;
 	std::unique_ptr<EventBus> eventBus;
 
+
+	/// Temporary
+	Entity player{-1};
+	bool hasColider = true;
+
 public:
 	Game();
 	~Game();

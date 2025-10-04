@@ -46,7 +46,10 @@ std::string Entity::GetTag() const {
 }
 
 void System::AddEntityToSystem(Entity entity) {
-    entities.push_back(entity);
+    // we add an entity only if it's not in the system already
+    if (std::find(entities.begin(), entities.end(), entity) == entities.end()) {
+        entities.push_back(entity);
+    }
 }
 
 void System::RemoveEntityFromSystem(const Entity entity) {

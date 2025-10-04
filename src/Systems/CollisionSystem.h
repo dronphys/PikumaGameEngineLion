@@ -10,10 +10,15 @@
 #include "../Logger/Logger.h"
 #include "../EventBus/EventBus.h"
 #include "../Events/CollisionEvent.h"
+#include "../misc/QuadTree.h"
 
 class CollisionSystem: public System {
+private:
+    QuadTreeNode tree;
 public:
-    CollisionSystem() {
+    CollisionSystem():
+    tree(Rect(0,0,1000,1000))
+    {
         RequireComponent<BoxColliderComponent>();
         RequireComponent<TransformComponent>();
     }
@@ -29,20 +34,31 @@ public:
             entity.GetComponent<BoxColliderComponent>().isColliding = false;
         }
 
-
-        for (; entity1It != entities.end(); entity1It++) {
-            auto entity2It = entity1It;
-            Entity e1 = *entity1It;
-            for (;entity2It != entities.end(); entity2It++ ) {
-                Entity e2 = *entity2It;
-                if (e1==e2) continue;
-                if (checkAABBCollision(e1,e2)) {
-                    //ResolveCollision(e1,e2);
-                    eventBus->EmitEvent<CollisionEvent>(e1,e2);
-                }
-
+        // reset tree
+        tree.Clear();
+        // Build a tree again
+        for (auto entity: entities) {
+            if (!tree.Insert(entity)) {
+                std::cout <<"Error inserting in tree" << std::endl;
             }
+        }
 
+        std::vector<Entity> candidates;
+        candidates.reserve(100);
+        for (auto& entity: entities) {
+            const auto& boxCollider = entity.GetComponent<BoxColliderComponent>();
+            const auto& transform = entity.GetComponent<TransformComponent>();
+            // finding candidates for certain entity
+            tree.Query(Rect(transform.position.x, transform.position.y, boxCollider.width,boxCollider.height),candidates);
+
+            for (auto& otherEntity: candidates) {
+                if (entity==otherEntity) {continue;}
+                if (checkAABBCollision(entity, otherEntity)) {
+                    // resolve collision emitting event
+                    eventBus->EmitEvent<CollisionEvent>(entity,otherEntity);
+                }
+            }
+            candidates.clear();
         }
     }
 
