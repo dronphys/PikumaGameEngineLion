@@ -71,7 +71,7 @@ public:
         // Build a tree again
         for (auto entity: entities) {
             if (!tree.Insert(entity)) {
-                std::cout <<"Error inserting in tree" << std::endl;
+                std::cout <<"Error inserting in tree\n";
             }
         }
         EventBus* ev = eventBus.get();
