@@ -56,7 +56,9 @@ void System::RemoveEntityFromSystem(const Entity entity) {
 std::vector<Entity> System::GetSystemEntities() const {
     return entities;
 }
-
+const std::vector<Entity>& System::GetRefSystemEntities() const {
+    return entities;
+}
 const Signature & System::GetComponentSignature() const {
     return componentSignature;
 }

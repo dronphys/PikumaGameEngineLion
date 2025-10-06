@@ -25,7 +25,7 @@ public:
 
     void Update(std::unique_ptr<EventBus>& eventBus) {
         // check all collision of entities with all other entities
-        auto entities = GetSystemEntities();
+        const auto& entities = GetRefSystemEntities();
         auto entity1It = entities.begin();
 
         // by default entities do no collide.

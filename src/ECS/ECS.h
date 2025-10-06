@@ -171,7 +171,7 @@ public:
     void RemoveEntityFromSystem(Entity entity);
     std::vector<Entity> GetSystemEntities() const;
     const Signature& GetComponentSignature() const;
-
+    const std::vector<Entity>& System::GetRefSystemEntities() const;
     template <typename TComponent>
     void RequireComponent();
 };
