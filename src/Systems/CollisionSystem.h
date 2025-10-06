@@ -17,7 +17,7 @@ class CollisionSystem: public System {
 private:
     QuadTreeNode tree;
     thread_pool pool;
-    std::size_t chunk_size = 100;
+    std::size_t chunk_size = 500;
     std::vector<std::future<void>> futures;
 public:
     CollisionSystem():
@@ -74,14 +74,14 @@ public:
                 std::cout <<"Error inserting in tree" << std::endl;
             }
         }
-
+        EventBus* ev = eventBus.get();
         for (auto it = entities.begin(); it < entities.end(); ) {
             auto next = (std::distance(it, entities.end()) > chunk_size)
                       ? it + chunk_size
                       : entities.end();
 
-            futures.push_back(pool.submit([&, this]() {
-                this->CalculateCollisions(it, next, *eventBus);
+            futures.push_back(pool.submit([this,it,next,ev]() {
+                this->CalculateCollisions(it, next, *ev);
             }));
 
             it = next;
