@@ -17,7 +17,7 @@ class CollisionSystem: public System {
 private:
     QuadTreeNode tree;
     thread_pool pool;
-    std::size_t chunk_size = 500;
+    std::size_t chunk_size = 700;
     std::vector<std::future<void>> futures;
 public:
     CollisionSystem():

@@ -207,7 +207,7 @@ void Game::LoadLevel(int level) {
 	truck.AddComponent<SpriteComponent>("truck-image",32,32,1);
 	truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0,0.0));
 	truck.AddComponent<BoxColliderComponent>(64,64);
-	truck.AddComponent<ProjectileEmitterComponent>(200, 1, 2000000,1);
+	truck.AddComponent<ProjectileEmitterComponent>(20, 1, 2000000,1);
 	truck.AddComponent<HealthComponent>(100);
 
 	Entity hpLabelTruck = registry->CreateEntity();
