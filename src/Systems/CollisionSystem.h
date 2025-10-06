@@ -1,4 +1,4 @@
-//
+
 // Created by kuyba on 9/21/2025.
 //
 
@@ -11,17 +11,49 @@
 #include "../EventBus/EventBus.h"
 #include "../Events/CollisionEvent.h"
 #include "../misc/QuadTree.h"
-
+#include <vector>
+#include "../misc/ThreadPool.h"
 class CollisionSystem: public System {
 private:
     QuadTreeNode tree;
+    thread_pool pool;
+    std::size_t chunk_size = 100;
+    std::vector<std::future<void>> futures;
 public:
     CollisionSystem():
-    tree(Rect(0,0,1000,1000))
+    tree(Rect(-300,-300,5000,5000))
     {
         RequireComponent<BoxColliderComponent>();
         RequireComponent<TransformComponent>();
     }
+
+    using VecEntIt =  std::vector<Entity>::const_iterator;
+
+    void CalculateCollisions(VecEntIt firstIt, VecEntIt lastIt, EventBus& eventBus) {
+
+        for (firstIt; firstIt != lastIt; ++firstIt) {
+            std::vector<Entity> candidates;
+            candidates.reserve(100);
+            auto entity = *firstIt;
+            const auto& boxCollider = entity.GetComponent<BoxColliderComponent>();
+            const auto& transform = entity.GetComponent<TransformComponent>();
+            tree.Query(Rect(transform.position.x, transform.position.y, boxCollider.width,boxCollider.height),candidates);
+
+            for (auto& otherEntity: candidates) {
+                if (entity==otherEntity) {continue;}
+
+                // so our entities colide only oce with each other.
+                if (entity.GetId() > otherEntity.GetId()) {continue;}
+
+                if (checkAABBCollision(entity, otherEntity)) {
+                    // resolve collision emitting event
+                    eventBus.EmitEvent<CollisionEvent>(entity,otherEntity);
+                }
+            }
+            candidates.clear();
+        }
+    }
+
 
     void Update(std::unique_ptr<EventBus>& eventBus) {
         // check all collision of entities with all other entities
@@ -43,27 +75,22 @@ public:
             }
         }
 
-        std::vector<Entity> candidates;
-        candidates.reserve(100);
-        for (auto& entity: entities) {
-            const auto& boxCollider = entity.GetComponent<BoxColliderComponent>();
-            const auto& transform = entity.GetComponent<TransformComponent>();
-            // finding candidates for certain entity
-            tree.Query(Rect(transform.position.x, transform.position.y, boxCollider.width,boxCollider.height),candidates);
+        for (auto it = entities.begin(); it < entities.end(); ) {
+            auto next = (std::distance(it, entities.end()) > chunk_size)
+                      ? it + chunk_size
+                      : entities.end();
 
-            for (auto& otherEntity: candidates) {
-                if (entity==otherEntity) {continue;}
+            futures.push_back(pool.submit([&, this]() {
+                this->CalculateCollisions(it, next, *eventBus);
+            }));
 
-                // so our entities colide only oce with each other.
-                if (entity.GetId() > otherEntity.GetId()) {continue;}
-
-                if (checkAABBCollision(entity, otherEntity)) {
-                    // resolve collision emitting event
-                    eventBus->EmitEvent<CollisionEvent>(entity,otherEntity);
-                }
-            }
-            candidates.clear();
+            it = next;
         }
+
+        // wait for all
+        for (auto& f : futures) f.get();
+        futures.clear();
+
     }
 
     bool checkAABBCollision (Entity a, Entity b) {
