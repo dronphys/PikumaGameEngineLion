@@ -54,6 +54,24 @@ add_executable(${PROJECT_NAME} src/Main.cpp
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/SDL2/include)
 
+
+set(IMGUI_SRC
+        libs/imgui/imgui.cpp
+        libs/imgui/imgui_draw.cpp
+        libs/imgui/imgui_tables.cpp
+        libs/imgui/imgui_widgets.cpp
+        libs/imgui/imgui_demo.cpp
+        libs/imgui/imgui_impl_sdl2.cpp
+        libs/imgui/imgui_impl_sdlrenderer2.cpp
+)
+
+target_sources(${PROJECT_NAME} PRIVATE ${IMGUI_SRC})
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui
+)
+
+
 set(SDL2_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/SDL2/lib/x64")
 
 find_library(SDL2_LIBRARY
@@ -95,7 +113,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 
-file(GLOB SDL2_DLLS "${CMAKE_CURRENT_SOURCE_DIR}/bin/*.dll")
+file(GLOB SDL2_DLLS "${CMAKE_CURRENT_SOURCE_DIR}/SDL2/lib/x64/*.dll")
 
 foreach(DLL ${SDL2_DLLS})
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

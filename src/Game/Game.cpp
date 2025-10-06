@@ -26,6 +26,8 @@
 #include "../Systems/KeyboardMovementSystem.h"
 #include "../Systems/LifeSpanSystem.h"
 
+
+
 Game::Game() {
 	isRunning = false;
 	isDebug = false;
@@ -59,6 +61,14 @@ void Game::Initialize() {
 
 	windowWidth = 1800;//displayBounds.w ;
 	windowHeight = 960;//displayBounds.h ;
+
+
+
+	// initializing imgui
+	// ImGui::CreateContext();
+
+
+
 
 	camera.x = 0;
 	camera.y = 0;
@@ -372,12 +382,20 @@ void Game::Render() {
 	registry->GetSystem<RenderSystem>().Update(renderer,assetStore,camera);
 	if (isDebug) {
 		registry->GetSystem<RenderCollisionSystem>().Update(renderer,camera);
+
+		// showing imgui
+		// ImGui::NewFrame();
+		// ImGui::ShowDemoWindow();
+		// ImGui::Render();
+
 	}
 	registry->GetSystem<RenderTextSystem>().Update(renderer,assetStore,camera);
 	SDL_RenderPresent(renderer);
 }
 
 void Game::Destroy() {
+
+	// ImGui::DestroyContext();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
