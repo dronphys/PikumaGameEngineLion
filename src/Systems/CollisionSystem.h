@@ -17,7 +17,7 @@ private:
     QuadTreeNode tree;
 public:
     CollisionSystem():
-    tree(Rect(-400,-400,3000,3000))
+    tree(Rect(-400,-400,5000,5000))
     {
         RequireComponent<BoxColliderComponent>();
         RequireComponent<TransformComponent>();
