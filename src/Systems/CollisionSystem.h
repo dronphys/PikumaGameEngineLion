@@ -17,7 +17,7 @@ private:
     QuadTreeNode tree;
 public:
     CollisionSystem():
-    tree(Rect(0,0,1000,1000))
+    tree(Rect(-400,-400,3000,3000))
     {
         RequireComponent<BoxColliderComponent>();
         RequireComponent<TransformComponent>();
@@ -39,7 +39,7 @@ public:
         // Build a tree again
         for (auto entity: entities) {
             if (!tree.Insert(entity)) {
-                std::cout <<"Error inserting in tree" << std::endl;
+                std::cout <<"Error inserting in tree\n";
             }
         }
 
