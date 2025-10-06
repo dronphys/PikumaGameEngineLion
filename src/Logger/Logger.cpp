@@ -28,13 +28,13 @@ std::string CurrentDateTimeToString() {
 
 void Logger::Log(const std::string& message) {
 
-    LogEntry logEntry;
-    logEntry.type = LogType::LOG_INFO;
-    logEntry.message = "LOG: [" + CurrentDateTimeToString() + "] - " + message;
-    messages.push_back({ LogType::LOG_INFO, message });
-
-    // ANSI CODES
-    std::cout << "\x1B[32m" << logEntry.message << "\033[0m" << '\n';
+    // LogEntry logEntry;
+    // logEntry.type = LogType::LOG_INFO;
+    // logEntry.message = "LOG: [" + CurrentDateTimeToString() + "] - " + message;
+    // messages.push_back({ LogType::LOG_INFO, message });
+    //
+    // // ANSI CODES
+    // std::cout << "\x1B[32m" << logEntry.message << "\033[0m" << '\n';
 }
 
 void Logger::Err(const std::string& message) {

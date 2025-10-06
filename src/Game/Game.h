@@ -32,7 +32,9 @@ private:
 
 
 	/// Temporary
+
 	Entity player{-1};
+	Entity text{-2};
 	bool hasColider = true;
 
 public:

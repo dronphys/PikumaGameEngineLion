@@ -1,5 +1,6 @@
 #include "Game.h"
 #include <iostream>
+#include <random>
 #include "../Logger/Logger.h"
 #include "../ECS/ECS.h"
 #include "spdlog/common.h"
@@ -32,6 +33,7 @@ Game::Game() {
 	assetStore = std::make_unique<AssetStore>();
 	eventBus = std::make_unique<EventBus>();
 	Logger::Log("Game constructor called!");
+	Entity::registry = registry.get();
 }
 
 Game::~Game() {
@@ -154,6 +156,7 @@ void Game::LoadLevel(int level) {
 	registry->AddSystem<HealthBarSystem>();
 
 	assetStore->AddFont("charriot-font","../assets/fonts/charriot.ttf",20);
+	assetStore->AddFont("charriot-font-12","../assets/fonts/charriot.ttf",14);
 
 	// adding textures to asset store
 	assetStore->AddTexture(renderer,"tank-image", "../assets/images/tank-panther-right.png");
@@ -163,6 +166,10 @@ void Game::LoadLevel(int level) {
 	assetStore->AddTexture(renderer,"radar-image", "../assets/images/radar.png");
 	assetStore->AddTexture(renderer,"bullet-image", "../assets/images/bullet.png");
 	LoadLevelFromFile("../assets/tilemaps/jungle.map");
+
+	SDL_Color green = {0,255,0};
+
+
 
 	Entity tank = registry->CreateEntity();
 	tank.Group("enemies");
@@ -175,8 +182,19 @@ void Game::LoadLevel(int level) {
 	tank.AddComponent<SpriteComponent>("tank-image",32,32,2);
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(00.0,0.0));
 	tank.AddComponent<BoxColliderComponent>(64,64);
-	tank.AddComponent<ProjectileEmitterComponent>(30, 200, 10000,1);
+	tank.AddComponent<ProjectileEmitterComponent>(30, 1, 1000000,1);
 	tank.AddComponent<HealthComponent>(100);
+
+	Entity hpLabelTank = registry->CreateEntity();
+	hpLabelTank.Group("hpBar");
+	hpLabelTank.AddComponent<TextLabelComponent>("", "charriot-font-12", green);
+	hpLabelTank.AddComponent<TransformComponent>(
+		glm::vec2(50.0,50.0),
+		glm::vec2(1.0, 1.0),
+		0.0,
+		false);
+	hpLabelTank.AddComponent<LinkComponent>(glm::vec2(30,-10), tank);
+
 
 	Entity truck = registry->CreateEntity();
 	truck.Group("enemies");
@@ -189,8 +207,19 @@ void Game::LoadLevel(int level) {
 	truck.AddComponent<SpriteComponent>("truck-image",32,32,1);
 	truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0,0.0));
 	truck.AddComponent<BoxColliderComponent>(64,64);
-	truck.AddComponent<ProjectileEmitterComponent>(200, 100, 2000,1);
+	truck.AddComponent<ProjectileEmitterComponent>(200, 1, 2000000,1);
 	truck.AddComponent<HealthComponent>(100);
+
+	Entity hpLabelTruck = registry->CreateEntity();
+	hpLabelTruck.Group("hpBar");
+	hpLabelTruck.AddComponent<TextLabelComponent>("", "charriot-font-12", green);
+	hpLabelTruck.AddComponent<TransformComponent>(
+		glm::vec2(50.0,50.0),
+		glm::vec2(1.0, 1.0),
+		0.0,
+		false);
+	hpLabelTruck.AddComponent<LinkComponent>(glm::vec2(30,-10), truck);
+
 
 	// Choper is a player
 	Entity chopper = registry->CreateEntity();
@@ -227,9 +256,10 @@ void Game::LoadLevel(int level) {
 
 
 	Entity label = registry->CreateEntity();
+	text = label;
 	//
 	SDL_Color white = {255,255,255};
-	SDL_Color green = {0,255,0};
+
 	label.AddComponent<TextLabelComponent>("THIS IS A TEXT LABEL!!!", "charriot-font",green);
 	label.AddComponent<TransformComponent>(
 		 glm::vec2(20.0,20.0)
@@ -237,15 +267,16 @@ void Game::LoadLevel(int level) {
 		,0.0,
 		true);
 
-	Entity hpLabel = registry->CreateEntity();
-	hpLabel.Group("hpBar");
-	hpLabel.AddComponent<TextLabelComponent>("Here should be hp", "charriot-font", green);
-	hpLabel.AddComponent<TransformComponent>(
+	Entity hpLabelPlayer = registry->CreateEntity();
+	hpLabelPlayer.Group("hpBar");
+	hpLabelPlayer.AddComponent<TextLabelComponent>("", "charriot-font-12", green);
+	hpLabelPlayer.AddComponent<TransformComponent>(
 		glm::vec2(50.0,50.0),
 		glm::vec2(1.0, 1.0),
 		0.0,
 		false);
-	hpLabel.AddComponent<LinkComponent>(glm::vec2(20,-20), chopper);
+	hpLabelPlayer.AddComponent<LinkComponent>(glm::vec2(30,-10), chopper);
+
 }
 
 void Game::Setup() {
@@ -294,6 +325,11 @@ void Game::ProcessInput() {
 }
 
 void Game::Update() {
+
+	// temporary
+
+	auto& text_ = text.GetComponent<TextLabelComponent>().text;
+	text_ ="Number of entities = " + std::to_string(registry->numEntities);
 	// for now registry update must be the first thing we do in the new frame,
 	// otherwise, game might crash if we remove some component from entity
 

@@ -41,10 +41,6 @@ bool Entity::InGroup(const std::string &group) const {
     return registry->EntityInGroup(*this, group);
 }
 
-std::string Entity::GetTag() const {
-    return registry->GetEntityTag(*this);
-}
-
 void System::AddEntityToSystem(Entity entity) {
     // we add an entity only if it's not in the system already
     if (std::find(entities.begin(), entities.end(), entity) == entities.end()) {

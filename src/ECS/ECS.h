@@ -21,18 +21,14 @@ class Registry;
 class Entity {
 private:
     int id;
-
-
 public:
-    Registry* registry;
+    inline static Registry* registry = nullptr;
 
-    Entity(int id_) :id(id_) {
-    };
+    Entity(int id) :id(id) {};
     void Kill();
     int GetId() const;
     bool operator==(Entity other) const;
     bool operator<(Entity other) const;
-
 
     template <typename TComponent, typename... TArgs>
     void AddComponent(TArgs&& ...args);
@@ -50,7 +46,6 @@ public:
     bool HasTag(const std::string& tag) const;
     void Group(const std::string& group);
     bool InGroup(const std::string& group) const;
-    std::string GetTag() const;
 };
 
 struct IComponent {

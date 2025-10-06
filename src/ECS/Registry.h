@@ -16,7 +16,7 @@
 class Registry {
 
 private:
-    int numEntities = 0;
+
     // Vector of component pools
     // each pool contains all the data for a certain component
     // Vector idx = component type id
@@ -48,6 +48,7 @@ private:
     std::deque<int> freeIds;
 
 public:
+    int numEntities = 0;
     Registry() = default;
     Entity CreateEntity();
     void KillEntity(Entity entity);
