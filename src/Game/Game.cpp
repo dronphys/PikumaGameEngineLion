@@ -24,6 +24,7 @@
 #include "../Components/HealthComponent.h"
 #include "../Events/KeyPressedEvent.h"
 #include "../Systems/KeyboardMovementSystem.h"
+#include "../Systems/RenderGUISystem.h"
 #include "../Systems/LifeSpanSystem.h"
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_sdl2.h>
@@ -63,14 +64,6 @@ void Game::Initialize() {
 
 	windowWidth = 1800;//displayBounds.w ;
 	windowHeight = 960;//displayBounds.h ;
-
-
-
-
-
-
-
-
 
 	camera.x = 0;
 	camera.y = 0;
@@ -180,6 +173,7 @@ void Game::LoadLevel(int level) {
 	registry->AddSystem<RenderTextSystem>();
 	registry->AddSystem<LinkSystem>();
 	registry->AddSystem<HealthBarSystem>();
+	registry->AddSystem<RenderGUISystem>();
 
 	assetStore->AddFont("charriot-font","../assets/fonts/charriot.ttf",20);
 	assetStore->AddFont("charriot-font-12","../assets/fonts/charriot.ttf",14);
@@ -208,7 +202,7 @@ void Game::LoadLevel(int level) {
 	tank.AddComponent<SpriteComponent>("tank-image",32,32,2);
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(00.0,0.0));
 	tank.AddComponent<BoxColliderComponent>(64,64);
-	tank.AddComponent<ProjectileEmitterComponent>(30, 1, 1000000,1);
+	tank.AddComponent<ProjectileEmitterComponent>(300, 1000, 10000,1);
 	tank.AddComponent<HealthComponent>(100);
 
 	Entity hpLabelTank = registry->CreateEntity();
@@ -233,7 +227,7 @@ void Game::LoadLevel(int level) {
 	truck.AddComponent<SpriteComponent>("truck-image",32,32,1);
 	truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0,0.0));
 	truck.AddComponent<BoxColliderComponent>(64,64);
-	truck.AddComponent<ProjectileEmitterComponent>(20, 1, 2000000,1);
+	truck.AddComponent<ProjectileEmitterComponent>(200, 1000, 2000,1);
 	truck.AddComponent<HealthComponent>(100);
 
 	Entity hpLabelTruck = registry->CreateEntity();
@@ -256,7 +250,7 @@ void Game::LoadLevel(int level) {
 		 glm::vec2(600.0,00.0)
 		,glm::vec2(2.0, 2.0)
 		,0.0);
-	chopper.AddComponent<SpriteComponent>("chopper-image",32,32,1);
+	chopper.AddComponent<SpriteComponent>("chopper-image",32,32,2);
 	chopper.AddComponent<RigidBodyComponent>(glm::vec2(0.0,0.0));
 	chopper.AddComponent<AnimationComponent>(2,10);
 	chopper.AddComponent<KeyboardControlledComponent>(
@@ -266,7 +260,7 @@ void Game::LoadLevel(int level) {
 		glm::vec2(-100.0, 0.0));
 	chopper.AddComponent<CameraFollowComponent>();
 	chopper.AddComponent<HealthComponent>(100);
-	chopper.AddComponent<ProjectileEmitterComponent>(20, 0, 3000, 10, true);
+	chopper.AddComponent<ProjectileEmitterComponent>(200, 0, 3000, 10, true);
 	chopper.AddComponent<BoxColliderComponent>(64,64);
 
 
@@ -407,12 +401,7 @@ void Game::Render() {
 		registry->GetSystem<RenderCollisionSystem>().Update(renderer,camera);
 
 		// showing imgui
-		ImGui_ImplSDLRenderer2_NewFrame();
-		ImGui_ImplSDL2_NewFrame();
-		ImGui::NewFrame();
-		ImGui::ShowDemoWindow();
-		ImGui::Render();
-		ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
+		registry->GetSystem<RenderGUISystem>().Update(*registry, renderer);
 
 	}
 	registry->GetSystem<RenderTextSystem>().Update(renderer,assetStore,camera);

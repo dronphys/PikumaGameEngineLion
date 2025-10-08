@@ -49,6 +49,7 @@ add_executable(${PROJECT_NAME} src/Main.cpp
         src/Components/LinkComponent.h
         src/Systems/LinkSystem.h
         src/Systems/HealtBarSystem.h
+        src/Systems/RenderGUISystem.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs)
@@ -70,7 +71,13 @@ target_sources(${PROJECT_NAME} PRIVATE ${IMGUI_SRC})
 target_include_directories(${PROJECT_NAME} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui
 )
+target_include_directories(${PROJECT_NAME} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs/lua
+)
 
+target_link_libraries(${PROJECT_NAME}  PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs/lua/lua54.lib
+)
 
 set(SDL2_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/SDL2/lib/x64")
 
